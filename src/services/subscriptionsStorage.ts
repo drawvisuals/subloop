@@ -18,6 +18,7 @@ export interface SubscriptionData {
   notes: string;
   reminder: boolean;
   isVisible?: boolean;
+  imageUrl?: string;
 }
 
 const SUBSCRIPTIONS_KEY = 'subloop_subscriptions';

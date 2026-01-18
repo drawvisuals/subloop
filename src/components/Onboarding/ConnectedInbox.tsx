@@ -15,7 +15,7 @@ export function ConnectedInbox({ email, provider, status }: ConnectedInboxProps)
       <div className="flex gap-2 items-center">
         {/* Provider icon placeholder */}
         <div className="w-5 h-5 shrink-0 bg-neutral-500 rounded" />
-        <span className="font-normal text-base leading-[22px] text-white tracking-tight">
+        <span className="font-normal text-base leading-[22px] text-text-primary tracking-tight">
           {email}
         </span>
       </div>
@@ -34,10 +34,10 @@ export function ConnectedInbox({ email, provider, status }: ConnectedInboxProps)
         />
         <span className={`font-light text-sm leading-5 tracking-tight ${
           status === 'connected'
-            ? 'text-success-500'
+            ? 'text-text-success'
             : status === 'scanning'
-            ? 'text-brand-primary-500'
-            : 'text-danger-500'
+            ? 'text-text-brand'
+            : 'text-text-danger'
         }`}>
           {status === 'connected' ? 'Connected' : status === 'scanning' ? 'Scanning' : 'Error'}
         </span>

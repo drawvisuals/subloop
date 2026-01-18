@@ -79,11 +79,11 @@ export default function Login() {
 	};
 
 	return (
-		<div className="min-h-screen bg-neutral-900 flex items-center justify-center px-10 py-20">
+		<div className="min-h-screen bg-neutral-800 flex items-center justify-center px-10 py-20">
 			{/* Container matching Figma: 439px width, centered */}
 			<div className="w-full max-w-[439px] flex flex-col gap-8 items-center">
 				{/* Title */}
-				<h1 className="font-semibold h-[39px] leading-9 text-[30px] text-center text-white tracking-tight whitespace-pre-wrap w-full">
+				<h1 className="font-semibold h-[39px] leading-9 text-[30px] text-center text-text-primary tracking-tight whitespace-pre-wrap w-full">
 					Login
 				</h1>
 
@@ -136,7 +136,7 @@ export default function Login() {
 						<button
 							type="button"
 							onClick={handleForgotPassword}
-							className="w-full h-4 leading-[22px] text-neutral-700 text-base text-right tracking-tight hover:text-brand-primary-500 transition-colors"
+							className="w-full h-4 leading-normal text-text-secondary text-base text-right tracking-tight hover:text-text-brand transition-colors"
 						>
 							Forgot password?
 						</button>
@@ -145,7 +145,7 @@ export default function Login() {
 					{/* General Error Message */}
 					{errors.general && (
 						<div className="w-full p-4 bg-danger-500/10 border border-danger-500 rounded-lg" role="alert" aria-live="polite">
-							<p className="text-sm text-danger-500 leading-[22px]">
+							<p className="text-sm text-text-danger leading-normal">
 								{errors.general}
 							</p>
 						</div>
@@ -163,11 +163,11 @@ export default function Login() {
 
 						{/* Link to Sign Up */}
 						<div className="flex items-center">
-							<p className="font-normal leading-[22px] text-base text-white tracking-tight">
+							<p className="font-normal leading-normal text-base text-text-primary tracking-tight">
 								Don't have an account?{' '}
 								<Link
 									to="/auth/signup"
-									className="text-brand-primary-500 hover:text-brand-primary-400 transition-colors"
+									className="text-text-brand hover:text-brand-primary-400 transition-colors"
 								>
 									Create account
 								</Link>

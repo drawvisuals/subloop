@@ -76,7 +76,7 @@ export default function Profile() {
 			<div className="pt-6 sm:pt-8 md:pt-12 pb-6 sm:pb-8">
 				<div className="w-full max-w-[438px] flex flex-col gap-6 sm:gap-8">
           {/* Page Title */}
-          <h1 className="font-semibold text-xl sm:text-2xl leading-[28px] sm:leading-[30px] text-white tracking-tight">
+          <h1 className="font-semibold text-xl sm:text-2xl leading-[28px] sm:leading-[30px] text-text-primary tracking-tight">
             Manage your account
           </h1>
 
@@ -85,13 +85,13 @@ export default function Profile() {
             <div className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-5 flex flex-col gap-6">
               {/* Header with Edit Icon */}
               <div className="w-full flex items-center justify-between">
-                <h2 className="font-normal text-xl leading-[26px] text-white">
+                <h2 className="font-normal text-xl leading-[26px] text-text-primary">
                   Profile information
                 </h2>
                 <button
                   type="button"
                   onClick={handleEditProfile}
-                  className="w-4 h-4 text-white hover:text-brand-primary-500 transition-colors"
+                  className="w-4 h-4 text-text-primary hover:text-text-brand transition-colors"
                   aria-label="Edit profile"
                 >
                   <PenLine className="w-4 h-4" />
@@ -102,16 +102,16 @@ export default function Profile() {
               <div className="w-full flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
                 <div className="flex gap-3 items-center">
                   {/* Profile Photo */}
-                  <div className="w-11 h-11 rounded-full overflow-hidden relative border-2 border-neutral-400 shrink-0">
+                  <div className="w-11 h-11 rounded-full overflow-hidden relative border-2 border-neutral-700 shrink-0">
                     <div className="w-full h-full bg-gradient-to-br from-brand-primary-400 to-brand-secondary-400" />
                     <div className="absolute inset-0 bg-neutral-200/30" />
                   </div>
                   {/* Name + Email */}
                   <div className="flex flex-col gap-1">
-                    <span className="font-normal text-base leading-[22px] text-white tracking-tight">
+                    <span className="font-normal text-base leading-normal text-text-primary tracking-tight">
                       {profileData.name}
                     </span>
-                    <span className="font-light text-sm leading-5 text-neutral-700 tracking-tight">
+                    <span className="font-light text-sm leading-5 text-text-secondary tracking-tight">
                       {profileData.email}
                     </span>
                   </div>
@@ -120,7 +120,7 @@ export default function Profile() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex items-center gap-1 text-sm font-semibold text-danger-400 hover:text-danger-500 transition-colors min-h-[44px] sm:min-h-0 active:opacity-75"
+                  className="flex items-center gap-1 text-sm font-semibold text-text-danger hover:text-danger-500 transition-colors min-h-[44px] sm:min-h-0 active:opacity-75"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Log out</span>
@@ -132,11 +132,11 @@ export default function Profile() {
                 <div className="flex items-center gap-2">
                   {/* Gmail Icon placeholder */}
                   <div className="w-5 h-4 shrink-0 bg-neutral-500 rounded" />
-                  <span className="font-normal text-base leading-[22px] text-white tracking-tight">
+                  <span className="font-normal text-base leading-normal text-text-primary tracking-tight">
                     {profileData.email}
                   </span>
                 </div>
-                <span className="font-light text-sm leading-5 text-neutral-700 tracking-tight">
+                <span className="font-light text-sm leading-5 text-text-secondary tracking-tight">
                   Last login: {formatDate(profileData.lastLogin)}
                 </span>
               </div>
@@ -146,7 +146,7 @@ export default function Profile() {
           {/* Plan and Usage Section */}
           <div className="w-full flex flex-col gap-6">
             <div className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-5 flex flex-col gap-6">
-              <h2 className="font-normal text-xl leading-[26px] text-white">
+              <h2 className="font-normal text-xl leading-[26px] text-text-primary">
                 Plan and usage
               </h2>
 
@@ -154,32 +154,33 @@ export default function Profile() {
               <div className="w-full pb-5 border-b border-neutral-700 flex flex-col sm:flex-row gap-3 sm:gap-0 items-start sm:items-center justify-between">
                 <div className="flex-1 flex flex-col gap-3">
                   <div className="flex items-center gap-2">
-                    <Snail className="w-4 h-4 text-neutral-700 shrink-0" />
-                    <span className="font-mono font-normal text-sm leading-5 text-neutral-700">
+                    <Snail className="w-4 h-4 text-text-secondary shrink-0" />
+                    <span className="font-mono font-normal text-sm leading-5 text-text-secondary">
                       Current plan
                     </span>
                   </div>
-                  <span className="font-normal text-base leading-[22px] text-white tracking-tight">
+                  <span className="font-normal text-base leading-normal text-text-primary tracking-tight">
                     {profileData.plan}
                   </span>
                 </div>
-                <Button
+                <button
                   onClick={handleGetPro}
-                  className="h-[34px] px-4 py-1.5 text-sm"
+                  className="h-[34px] px-4 py-1.5 rounded-lg flex items-center justify-center font-semibold text-sm leading-5 text-text-primary overflow-hidden bg-gradient-to-r from-brand-primary-500 to-brand-secondary-500 hover:from-brand-secondary-500 hover:to-brand-primary-500 transition-all relative"
                 >
-                  Get Pro
-                </Button>
+                  <span className="relative z-10">Get Pro</span>
+                  <div className="absolute inset-0 rounded-[inherit] pointer-events-none shadow-[inset_0px_1px_2px_0px_rgba(146,231,255,0.5)]" />
+                </button>
               </div>
 
               {/* Connected Emails */}
               <div className="w-full pb-5 border-b border-neutral-700 flex flex-col gap-3">
                 <div className="flex items-center gap-2">
-                  <MailCheck className="w-4 h-4 text-neutral-700 shrink-0" />
-                  <span className="font-mono font-normal text-sm leading-5 text-neutral-700">
+                  <MailCheck className="w-4 h-4 text-text-secondary shrink-0" />
+                  <span className="font-mono font-normal text-sm leading-5 text-text-secondary">
                     Connected emails
                   </span>
                 </div>
-                <span className="font-normal text-base leading-[22px] text-white tracking-tight">
+                <span className="font-normal text-base leading-normal text-text-primary tracking-tight">
                   {profileData.connectedEmails} inbox connected
                 </span>
               </div>
@@ -187,12 +188,12 @@ export default function Profile() {
               {/* Subscriptions Tracked */}
               <div className="w-full flex flex-col gap-3">
                 <div className="flex items-center gap-2">
-                  <TableProperties className="w-4 h-4 text-neutral-700 shrink-0" />
-                  <span className="font-mono font-normal text-sm leading-5 text-neutral-700">
+                  <TableProperties className="w-4 h-4 text-text-secondary shrink-0" />
+                  <span className="font-mono font-normal text-sm leading-5 text-text-secondary">
                     Subscriptions tracked
                   </span>
                 </div>
-                <span className="font-normal text-base leading-[22px] text-white tracking-tight">
+                <span className="font-normal text-base leading-normal text-text-primary tracking-tight">
                   {profileData.activeSubscriptions} active subscriptions and {profileData.inactiveSubscriptions} inactive
                 </span>
               </div>
@@ -202,19 +203,19 @@ export default function Profile() {
           {/* Privacy and Data Section */}
           <div className="w-full flex flex-col gap-6">
             <div className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-5 flex flex-col gap-6">
-              <h2 className="font-normal text-xl leading-[26px] text-white">
+              <h2 className="font-normal text-xl leading-[26px] text-text-primary">
                 Privacy and data
               </h2>
 
               {/* Email Access */}
               <div className="w-full pb-5 border-b border-neutral-700 flex flex-col gap-3">
                 <div className="flex items-center gap-2">
-                  <MailCheck className="w-4 h-4 text-neutral-700 shrink-0" />
-                  <span className="font-mono font-normal text-sm leading-5 text-neutral-700">
+                  <MailCheck className="w-4 h-4 text-text-secondary shrink-0" />
+                  <span className="font-mono font-normal text-sm leading-5 text-text-secondary">
                     Email access
                   </span>
                 </div>
-                <span className="font-normal text-base leading-[22px] text-white tracking-tight">
+                <span className="font-normal text-base leading-normal text-text-primary tracking-tight">
                   Read-only access to billing emails
                 </span>
               </div>
@@ -222,12 +223,12 @@ export default function Profile() {
               {/* Data Storage */}
               <div className="w-full pb-5 border-b border-neutral-700 flex flex-col gap-3">
                 <div className="flex items-center gap-2">
-                  <DatabaseZap className="w-4 h-4 text-neutral-700 shrink-0" />
-                  <span className="font-mono font-normal text-sm leading-5 text-neutral-700">
+                  <DatabaseZap className="w-4 h-4 text-text-secondary shrink-0" />
+                  <span className="font-mono font-normal text-sm leading-5 text-text-secondary">
                     Data storage
                   </span>
                 </div>
-                <span className="font-normal text-base leading-[22px] text-white tracking-tight">
+                <span className="font-normal text-base leading-normal text-text-primary tracking-tight">
                   We store only subscription metadata
                 </span>
               </div>
@@ -236,7 +237,7 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={handlePrivacyPolicy}
-                className="w-auto px-6 py-2.5 bg-neutral-700 rounded-lg flex items-center justify-center font-semibold text-base leading-[22px] text-white hover:bg-neutral-600 transition-colors"
+                className="w-auto px-6 py-2.5 bg-neutral-700 rounded-lg flex items-center justify-center font-semibold text-base leading-normal text-text-primary hover:bg-neutral-600 transition-colors"
               >
                 Privacy Policy
               </button>
@@ -246,19 +247,19 @@ export default function Profile() {
           {/* Delete Account Section */}
           <div className="w-full flex flex-col gap-6">
             <div className="w-full bg-neutral-900 border border-danger-500 rounded-lg p-5 flex flex-col gap-6">
-              <h2 className="font-normal text-xl leading-[26px] text-white">
+              <h2 className="font-normal text-xl leading-[26px] text-text-primary">
                 Delete account
               </h2>
 
               {/* Delete Account Info */}
               <div className="w-full pb-5 border-b border-neutral-700 flex flex-col gap-3">
                 <div className="flex items-center gap-2">
-                  <Skull className="w-4 h-4 text-neutral-700 shrink-0" />
-                  <span className="font-mono font-normal text-sm leading-5 text-neutral-700">
+                  <Skull className="w-4 h-4 text-text-secondary shrink-0" />
+                  <span className="font-mono font-normal text-sm leading-5 text-text-secondary">
                     Delete account
                   </span>
                 </div>
-                <p className="font-normal text-base leading-[22px] text-white tracking-tight">
+                <p className="font-normal text-base leading-normal text-text-primary tracking-tight">
                   This will permanently delete your account and all associated data.{' '}
                   <span className="text-danger-400">This action can't be undone.</span>
                 </p>
@@ -268,7 +269,7 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={handleDeleteAccount}
-                className="w-auto px-6 py-2.5 bg-danger-500 rounded-lg flex items-center justify-center font-semibold text-base leading-[22px] text-white hover:bg-danger-600 transition-colors"
+                className="w-auto px-6 py-2.5 bg-danger-500 rounded-lg flex items-center justify-center font-semibold text-base leading-normal text-text-primary hover:bg-danger-600 transition-colors"
               >
                 Delete account
               </button>
@@ -280,12 +281,12 @@ export default function Profile() {
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
               <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6 max-w-md w-full flex flex-col gap-4">
                 <div className="flex items-start gap-3">
-                  <AlertTriangle className="w-5 h-5 text-danger-500 shrink-0 mt-0.5" />
+                  <AlertTriangle className="w-5 h-5 text-text-danger shrink-0 mt-0.5" />
                   <div className="flex-1 flex flex-col gap-2">
-                    <h3 className="font-semibold text-lg leading-6 text-white">
+                    <h3 className="font-semibold text-lg leading-6 text-text-primary">
                       Delete account?
                     </h3>
-                    <p className="font-normal text-sm leading-5 text-neutral-700">
+                    <p className="font-normal text-sm leading-5 text-text-secondary">
                       This action will permanently delete your account and all associated data. This cannot be undone.
                     </p>
                   </div>
@@ -294,14 +295,14 @@ export default function Profile() {
                   <button
                     type="button"
                     onClick={handleCancelDelete}
-                    className="flex-1 px-4 py-2.5 bg-neutral-700 border border-neutral-600 text-white text-sm font-medium rounded-lg hover:bg-neutral-600 transition-colors"
+                    className="flex-1 px-4 py-2.5 bg-neutral-700 border border-neutral-700 text-text-primary text-sm font-medium rounded-lg hover:bg-neutral-600 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     onClick={handleConfirmDelete}
-                    className="flex-1 px-4 py-2.5 bg-danger-500 text-white text-sm font-medium rounded-lg hover:bg-danger-600 transition-colors"
+                    className="flex-1 px-4 py-2.5 bg-danger-500 text-text-primary text-sm font-medium rounded-lg hover:bg-danger-600 transition-colors"
                   >
                     Delete account
                   </button>

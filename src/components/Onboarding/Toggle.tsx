@@ -6,9 +6,9 @@ interface ToggleProps {
 
 /**
  * Toggle switch component matching Figma design
- * - Off state: gray background (#7c7c7c)
- * - On state: green background (#00e177) with white circle
- * - Disabled state: dark background (#101010)
+ * - Off state: gray background (neutral-700)
+ * - On state: green background (success-500) with white circle
+ * - Disabled state: dark background (neutral-100)
  */
 export function Toggle({ checked, onChange, disabled = false }: ToggleProps) {
   return (
@@ -27,7 +27,7 @@ export function Toggle({ checked, onChange, disabled = false }: ToggleProps) {
       aria-checked={checked}
       role="switch"
     >
-      <div className="w-4 h-4 bg-white rounded-full transition-transform" />
+      <div className="w-4 h-4 bg-foundation-white rounded-full transition-transform" />
     </button>
   );
 }

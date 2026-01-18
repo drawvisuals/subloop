@@ -11,26 +11,26 @@ export default {
       colors: {
         // Brand colors
         brand: {
-          primary: tokens.colors.brand.primary,
-          secondary: tokens.colors.brand.secondary,
+          primary: { ...tokens.colors.brand.primary },
+          secondary: { ...tokens.colors.brand.secondary },
         },
 
         // Foundation colors
-        foundation: tokens.colors.foundation,
+        foundation: { ...tokens.colors.foundation },
 
-        // Neutral scale
-        neutral: tokens.colors.neutral,
+        // Neutral scale - spread to avoid readonly issues
+        neutral: { ...tokens.colors.neutral },
 
         // Semantic colors
-        success: tokens.colors.semantic.success,
-        warning: tokens.colors.semantic.warning,
-        danger: tokens.colors.semantic.danger,
-        information: tokens.colors.semantic.information,
+        success: { ...tokens.colors.semantic.success },
+        warning: { ...tokens.colors.semantic.warning },
+        danger: { ...tokens.colors.semantic.danger },
+        information: { ...tokens.colors.semantic.information },
 
         // Convenience color mappings
-        text: tokens.colors.text,
-        background: tokens.colors.background,
-        border: tokens.colors.border,
+        text: { ...tokens.colors.text },
+        background: { ...tokens.colors.background },
+        border: { ...tokens.colors.border },
       },
 
       fontFamily: {

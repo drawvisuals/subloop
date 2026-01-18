@@ -77,11 +77,11 @@ export default function SignUp() {
 	};
 
 	return (
-		<div className="min-h-screen bg-neutral-900 flex items-center justify-center px-10 py-20">
+		<div className="min-h-screen bg-neutral-800 flex items-center justify-center px-10 py-20">
 			{/* Container matching Figma: 438px width, centered */}
 			<div className="w-full max-w-[438px] flex flex-col gap-8 items-center">
 				{/* Title */}
-				<h1 className="font-semibold h-[39px] leading-9 text-[30px] text-center text-white tracking-tight whitespace-pre-wrap w-full">
+				<h1 className="font-semibold h-[39px] leading-9 text-[30px] text-center text-text-primary tracking-tight whitespace-pre-wrap w-full">
 					Create your account
 				</h1>
 
@@ -132,7 +132,7 @@ export default function SignUp() {
 					{/* General Error Message */}
 					{errors.general && (
 						<div className="w-full p-4 bg-danger-500/10 border border-danger-500 rounded-lg" role="alert" aria-live="polite">
-							<p className="text-sm text-danger-500 leading-[22px]">
+							<p className="text-sm text-text-danger leading-normal">
 								{errors.general}
 							</p>
 						</div>
@@ -150,11 +150,11 @@ export default function SignUp() {
 
 						{/* Link to Login */}
 						<div className="flex items-center">
-							<p className="font-normal leading-[22px] text-base text-white tracking-tight">
+							<p className="font-normal leading-normal text-base text-text-primary tracking-tight">
 								Already have an account?{' '}
 								<Link
 									to="/auth/login"
-									className="text-brand-primary-500 hover:text-brand-primary-400 transition-colors"
+									className="text-text-brand hover:text-brand-primary-400 transition-colors"
 								>
 									Login
 								</Link>

@@ -46,10 +46,10 @@ export default function FAQ() {
       <div className="pt-16 pb-20">
         {/* Header */}
         <div className="max-w-3xl mx-auto flex flex-col gap-6 items-center text-center mb-16">
-          <h1 className="font-semibold text-4xl leading-[48px] text-white tracking-tight">
+          <h1 className="font-semibold text-4xl leading-[48px] text-text-primary tracking-tight">
             Frequently asked questions
           </h1>
-          <p className="font-normal text-xl leading-7 text-neutral-700">
+          <p className="font-normal text-xl leading-7 text-text-secondary">
             Everything you need to know about Subloop.
           </p>
         </div>
@@ -66,18 +66,18 @@ export default function FAQ() {
                 onClick={() => toggleFAQ(index)}
                 className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-neutral-800/50 transition-colors"
               >
-                <h3 className="font-semibold text-lg leading-7 text-white pr-8">
+                <h3 className="font-semibold text-lg leading-7 text-text-primary pr-8">
                   {faq.question}
                 </h3>
                 <ChevronDown
-                  className={`w-5 h-5 text-white shrink-0 transition-transform ${
+                  className={`w-5 h-5 text-text-primary shrink-0 transition-transform ${
                     openIndex === index ? 'transform rotate-180' : ''
                   }`}
                 />
               </button>
               {openIndex === index && (
                 <div className="px-6 pb-5 border-t border-neutral-700">
-                  <p className="font-normal text-base leading-[22px] text-neutral-700 pt-4">
+                  <p className="font-normal text-base leading-[22px] text-text-secondary pt-4">
                     {faq.answer}
                   </p>
                 </div>
@@ -87,15 +87,15 @@ export default function FAQ() {
         </div>
 
         {/* Contact CTA */}
-        <div className="max-w-2xl mx-auto flex flex-col gap-4 items-center text-center mt-16 pt-12 border-t border-neutral-200">
-          <p className="font-normal text-base leading-[22px] text-neutral-700">
+        <div className="max-w-2xl mx-auto flex flex-col gap-4 items-center text-center mt-16 pt-12 border-t border-neutral-700">
+          <p className="font-normal text-base leading-[22px] text-text-secondary">
             Still have questions?
           </p>
-          <p className="font-normal text-base leading-[22px] text-white">
+          <p className="font-normal text-base leading-[22px] text-text-primary">
             Contact us at{' '}
             <a
               href="mailto:support@usesubloop.com"
-              className="text-brand-primary-500 hover:text-brand-primary-400 transition-colors underline"
+              className="text-text-brand hover:text-brand-primary-400 transition-colors underline"
             >
               support@usesubloop.com
             </a>

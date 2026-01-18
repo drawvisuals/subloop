@@ -17,10 +17,10 @@ export function GoogleButton({ onClick, children, disabled = false }: GoogleButt
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="w-full h-[54px] px-6 py-4 bg-white rounded-lg flex gap-2 items-center justify-center transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+      className="w-full h-[54px] px-6 py-4 bg-foundation-white rounded-lg flex gap-2 items-center justify-center transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <GoogleIcon className="w-5 h-5 shrink-0" />
-      <span className="font-semibold text-base leading-[22px] text-neutral-50 text-center">
+      <span className="font-semibold text-base leading-normal text-text-inverse text-center">
         {children}
       </span>
     </button>

@@ -29,21 +29,21 @@ export function EmptyState() {
 			<div className="w-full max-w-[439px] flex flex-col gap-8 items-center">
 				{/* Icon + Title */}
 				<div className="w-full flex flex-col gap-3 items-center">
-					<TableProperties className="w-6 h-6 text-white shrink-0" />
-					<h2 className="font-semibold leading-9 text-[30px] text-center text-white tracking-tight whitespace-pre-wrap w-full">
+					<TableProperties className="w-6 h-6 text-text-primary shrink-0" />
+					<h2 className="font-semibold leading-9 text-[30px] text-center text-text-primary tracking-tight whitespace-pre-wrap w-full">
 						No subscriptions yet
 					</h2>
 				</div>
 
 				{/* Add Chrome Extension CTA */}
 				<div className="w-full flex flex-col gap-3 items-start">
-					<p className="font-normal leading-[22px] text-base text-neutral-700 text-center tracking-tight whitespace-pre-wrap w-full">
-						Add the browser extension to <span className="text-white">save new subscriptions</span>.
+					<p className="font-normal leading-[22px] text-base text-text-secondary text-center tracking-tight whitespace-pre-wrap w-full">
+						Add the browser extension to <span className="text-text-primary">save new subscriptions</span>.
 					</p>
 					<button
 						type="button"
 						onClick={handleAddChromeExtension}
-						className="w-full h-[54px] px-6 py-4 bg-brand-secondary-500 rounded-lg flex gap-2 items-center justify-center font-semibold text-base leading-[22px] text-white transition-opacity hover:opacity-90"
+						className="w-full h-[54px] px-6 py-4 bg-brand-secondary-500 rounded-lg flex gap-2 items-center justify-center font-semibold text-base leading-[22px] text-text-primary transition-opacity hover:opacity-90"
 					>
 						{/* Chrome Icon placeholder */}
 						<div className="w-[23px] h-[22px] shrink-0 bg-white/20 rounded" />
@@ -54,13 +54,13 @@ export function EmptyState() {
 
 				{/* Scan Emails CTA */}
 				<div className="w-full flex flex-col gap-3 items-start">
-					<p className="font-normal leading-[22px] text-base text-neutral-700 text-center tracking-tight whitespace-pre-wrap w-full">
-						Scan you email inbox to <span className="text-white">add new subscriptions</span>.
+					<p className="font-normal leading-[22px] text-base text-text-secondary text-center tracking-tight whitespace-pre-wrap w-full">
+						Scan you email inbox to <span className="text-text-primary">add new subscriptions</span>.
 					</p>
 					<button
 						type="button"
 						onClick={handleScanEmails}
-						className="w-full h-[54px] px-6 py-4 bg-brand-primary-500 rounded-lg flex gap-2 items-center justify-center font-semibold text-base leading-[22px] text-neutral-900 transition-opacity hover:opacity-90"
+						className="w-full h-[54px] px-6 py-4 bg-brand-primary-500 rounded-lg flex gap-2 items-center justify-center font-semibold text-base leading-[22px] text-text-inverse transition-opacity hover:opacity-90"
 					>
 						<span>Scan emails</span>
 						<ArrowRight className="w-[18px] h-[18px] shrink-0" />
@@ -69,13 +69,13 @@ export function EmptyState() {
 
 				{/* Add Manually CTA */}
 				<div className="w-full flex flex-col gap-3 items-start">
-					<p className="font-normal leading-[22px] text-base text-neutral-700 text-center tracking-tight whitespace-pre-wrap w-full">
+					<p className="font-normal leading-[22px] text-base text-text-secondary text-center tracking-tight whitespace-pre-wrap w-full">
 						Add your subscriptions manually.
 					</p>
 					<button
 						type="button"
 						onClick={handleAddManually}
-						className="w-full h-[54px] px-6 py-4 bg-neutral-200 border border-neutral-50 rounded-lg flex gap-2 items-center justify-center font-semibold text-base leading-[22px] text-white transition-opacity hover:opacity-90"
+						className="w-full h-[54px] px-6 py-4 bg-neutral-200 border border-neutral-700 rounded-lg flex gap-2 items-center justify-center font-semibold text-base leading-[22px] text-text-primary transition-opacity hover:opacity-90"
 					>
 						<span>Add manually</span>
 						<ArrowRight className="w-[18px] h-[18px] shrink-0" />

@@ -14,7 +14,7 @@ export function ProgressBar({ progress, label }: ProgressBarProps) {
 
   return (
     <div className="w-full flex flex-col gap-1 items-start px-4">
-      <div className="w-full bg-neutral-100 border border-neutral-200 rounded-full p-1 flex gap-1 items-center">
+      <div className="w-full bg-neutral-100 border border-neutral-700 rounded-full p-1 flex gap-1 items-center">
         {/* Progress fill */}
         <div
           className="h-3 rounded-full transition-all duration-300"
@@ -25,7 +25,7 @@ export function ProgressBar({ progress, label }: ProgressBarProps) {
         />
         {/* Percentage label */}
         {label && (
-          <span className="font-normal text-[13px] leading-4 text-white">
+          <span className="font-normal text-[13px] leading-4 text-text-primary">
             {label}
           </span>
         )}

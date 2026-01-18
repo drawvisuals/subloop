@@ -44,31 +44,31 @@ export default function Scanning() {
 	];
 
 	return (
-		<div className="min-h-screen bg-neutral-50 flex items-center justify-center px-4 sm:px-6 md:px-10 py-12 sm:py-16 md:py-20">
+		<div className="min-h-screen bg-neutral-800 flex items-center justify-center px-4 sm:px-6 md:px-10 py-12 sm:py-16 md:py-20">
 			{/* Container matching Figma: 438px width, centered */}
 			<div className="w-full max-w-[438px] flex flex-col gap-6 sm:gap-8 items-center justify-center">
 				{/* Icon + Title */}
 				<div className="w-full flex flex-col items-center">
 					<div className="w-full flex flex-col items-center gap-0">
 						{/* Scan icon */}
-						<ScanText className="w-6 h-6 shrink-0 mb-0 text-white" />
+						<ScanText className="w-6 h-6 shrink-0 mb-0 text-text-primary" />
 
 						{/* Title */}
-						<h1 className="font-semibold min-h-[39px] leading-8 sm:leading-9 text-2xl sm:text-[30px] text-center text-white tracking-tight whitespace-pre-wrap w-full mt-0">
+						<h1 className="font-semibold min-h-[39px] leading-8 sm:leading-9 text-2xl sm:text-[30px] text-center text-text-primary tracking-tight whitespace-pre-wrap w-full mt-0">
 							Scan in progress
 						</h1>
 					</div>
 				</div>
 
 				{/* Scanning Status Container */}
-				<div className="w-full bg-neutral-50 rounded-xl sm:rounded-2xl p-1 flex flex-col gap-2 items-center">
+				<div className="w-full bg-neutral-900 rounded-xl sm:rounded-2xl p-1 flex flex-col gap-2 items-center">
 					{/* Scanning Status Row */}
 					<div className="w-full flex flex-col items-start pb-4">
 						{/* "Scanning the last 12 months..." row */}
 						<div className="w-full flex gap-1 items-center p-4">
 							{/* Corner icon */}
-							<CornerDownRight className="w-3 h-3 shrink-0 text-neutral-700" />
-							<span className="flex-1 font-normal text-base leading-[22px] text-white tracking-tight">
+							<CornerDownRight className="w-3 h-3 shrink-0 text-text-secondary" />
+							<span className="flex-1 font-normal text-base leading-normal text-text-primary tracking-tight">
 								Scanning the last 12 months...
 							</span>
 						</div>

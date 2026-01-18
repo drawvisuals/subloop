@@ -13,6 +13,7 @@ interface SubscriptionFormData {
   reminder: boolean;
   status: 'Active' | 'Inactive' | 'Review';
   notes: string;
+  imageUrl?: string;
 }
 
 export default function AddSubscription() {
@@ -31,6 +32,7 @@ export default function AddSubscription() {
       status: formData.status,
       notes: formData.notes || '',
       reminder: formData.reminder,
+      imageUrl: formData.imageUrl || undefined,
     });
 
     // Redirect to detail view

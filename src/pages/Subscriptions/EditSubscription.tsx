@@ -13,6 +13,7 @@ interface SubscriptionFormData {
   reminder: boolean;
   status: 'Active' | 'Inactive' | 'Review';
   notes: string;
+  imageUrl?: string;
 }
 
 function formatDateForInput(date: Date | string | undefined): string {
@@ -30,10 +31,10 @@ export default function EditSubscription() {
   if (!subscription || !id) {
     return (
       <div className="pt-12 pb-8">
-        <p className="text-white">Subscription not found</p>
+        <p className="text-text-primary">Subscription not found</p>
         <button
           onClick={() => navigate('/app/subscriptions')}
-          className="text-brand-primary-500 hover:text-brand-primary-400"
+          className="text-text-brand hover:text-brand-primary-400"
         >
           Back to subscriptions
         </button>
@@ -53,6 +54,7 @@ export default function EditSubscription() {
     reminder: subscription.reminder !== undefined ? subscription.reminder : true,
     status: subscription.status || 'Active',
     notes: subscription.notes || '',
+    imageUrl: subscription.imageUrl || '',
   };
 
   const handleSubmit = (formData: SubscriptionFormData) => {
@@ -68,6 +70,7 @@ export default function EditSubscription() {
       status: formData.status,
       notes: formData.notes || '',
       reminder: formData.reminder,
+      imageUrl: formData.imageUrl || undefined,
     });
 
     navigate(`/app/subscription/${id}`);

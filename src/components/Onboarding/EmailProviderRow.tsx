@@ -28,11 +28,11 @@ export function EmailProviderRow({
   return (
     <div className="w-full flex gap-1 items-center">
       {/* Corner icon */}
-      <CornerDownRight className="w-3 h-3 shrink-0 text-neutral-700" />
+      <CornerDownRight className="w-3 h-3 shrink-0 text-text-secondary" />
 
       {/* Provider label with optional "coming soon" */}
       <div className="flex-1 flex gap-3 items-center">
-        <span className="font-normal text-base leading-[22px] text-white tracking-tight">
+        <span className="font-normal text-base leading-[22px] text-text-primary tracking-tight">
           {providerLabels[provider]}
         </span>
         {comingSoon && (

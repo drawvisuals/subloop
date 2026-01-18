@@ -11,14 +11,14 @@ export default function CheckoutCancel() {
       <div className="pt-16 pb-20">
         <div className="max-w-2xl mx-auto flex flex-col gap-8 items-center text-center">
           <div className="w-16 h-16 rounded-full bg-neutral-700/20 flex items-center justify-center">
-            <XCircle className="w-8 h-8 text-neutral-700" />
+            <XCircle className="w-8 h-8 text-text-secondary" />
           </div>
 
           <div className="flex flex-col gap-4">
-            <h1 className="font-semibold text-3xl leading-9 text-white">
+            <h1 className="font-semibold text-3xl leading-9 text-text-primary">
               Checkout cancelled
             </h1>
-            <p className="font-normal text-base leading-[22px] text-neutral-700 max-w-lg">
+            <p className="font-normal text-base leading-[22px] text-text-secondary max-w-lg">
               Your checkout was cancelled. No charges were made. You can continue using Subloop with the Free plan.
             </p>
           </div>
@@ -30,7 +30,7 @@ export default function CheckoutCancel() {
             <button
               type="button"
               onClick={() => navigate('/app/subscriptions')}
-              className="px-6 py-4 text-base font-medium text-white hover:text-white/80 transition-colors"
+              className="px-6 py-4 text-base font-medium text-text-primary hover:text-text-primary/80 transition-colors"
             >
               Continue with Free
             </button>

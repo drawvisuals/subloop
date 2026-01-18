@@ -18,9 +18,9 @@ export function AppLayout({ children }: AppLayoutProps) {
   const isSettingsActive = location.pathname.startsWith('/app/settings');
 
   return (
-    <div className="min-h-screen bg-neutral-900">
+    <div className="min-h-screen bg-neutral-800">
       {/* Header */}
-      <header className="bg-neutral-100 h-9 sm:h-10 border-b border-neutral-200 sticky top-0 z-30">
+      <header className="pt-8 h-9 sm:h-10 sticky top-0 z-30">
         <nav className="max-w-[1360px] mx-auto px-3 sm:px-4 md:px-10 h-full flex items-center justify-between relative">
           {/* Logo - left side */}
           <Link
@@ -29,17 +29,17 @@ export function AppLayout({ children }: AppLayoutProps) {
             aria-label="Subloop Home"
           >
             <Logo className="h-7 sm:h-9 w-auto" showText={false} />
-            <span className="hidden sm:inline ml-2 text-white font-medium text-sm">Subloop</span>
+            <span className="hidden sm:inline ml-2 text-text-primary font-medium text-sm">Subloop</span>
           </Link>
 
           {/* Navigation Links - centered - hide on mobile */}
           <div className="absolute left-1/2 transform -translate-x-1/2 hidden md:flex items-center gap-4 lg:gap-6 h-7">
             <Link
               to="/app/subscriptions"
-              className={`h-7 px-3 pb-3 flex items-center font-medium text-base leading-4 text-white transition-colors ${
+              className={`h-7 px-3 pb-3 flex items-center font-medium text-base leading-4 text-text-primary transition-colors ${
                 isSubscriptionsActive
-                  ? 'border-b-2 border-white'
-                  : 'border-b-2 border-transparent hover:text-neutral-700'
+                  ? 'border-b-2 border-text-primary'
+                  : 'border-b-2 border-transparent hover:text-text-secondary'
               }`}
               aria-current={isSubscriptionsActive ? 'page' : undefined}
             >
@@ -47,10 +47,10 @@ export function AppLayout({ children }: AppLayoutProps) {
             </Link>
             <Link
               to="/app/settings"
-              className={`h-7 px-3 pb-3 flex items-center font-medium text-base leading-4 text-white transition-colors ${
+              className={`h-7 px-3 pb-3 flex items-center font-medium text-base leading-4 text-text-primary transition-colors ${
                 isSettingsActive
-                  ? 'border-b-2 border-white'
-                  : 'border-b-2 border-transparent hover:text-neutral-700'
+                  ? 'border-b-2 border-text-primary'
+                  : 'border-b-2 border-transparent hover:text-text-secondary'
               }`}
               aria-current={isSettingsActive ? 'page' : undefined}
             >
@@ -63,10 +63,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             {/* Get Pro Button - hide text on small mobile */}
             <Link
               to="/#pricing"
-              className="relative h-7 sm:h-8 w-7 sm:w-[90px] sm:px-4 px-0 py-1 sm:py-1.5 rounded-lg flex items-center justify-center font-semibold text-xs sm:text-sm leading-4 sm:leading-5 text-white overflow-hidden"
-              style={{
-                backgroundImage: 'linear-gradient(250.87deg, #1EBBE6 9.18%, #1F36E6 87.99%)',
-              }}
+              className="relative h-7 sm:h-9 w-7 sm:w-[90px] sm:px-4 px-0 py-1 sm:py-1.5 rounded-lg flex items-center justify-center font-semibold text-xs sm:text-sm leading-4 sm:leading-5 text-text-primary overflow-hidden bg-gradient-to-r from-brand-primary-500 to-brand-secondary-500 hover:from-brand-secondary-500 hover:to-brand-primary-500 transition-all"
               aria-label="Get Pro"
             >
               <span className="relative z-10 hidden sm:inline">Get Pro</span>
@@ -90,17 +87,17 @@ export function AppLayout({ children }: AppLayoutProps) {
 
               {/* Dropdown Menu */}
               {isProfileDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-neutral-200 border border-neutral-300 rounded-lg shadow-lg py-1 z-50">
+                <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-neutral-200 border border-neutral-700 rounded-lg shadow-lg py-1 z-50">
                   <Link
                     to="/app/profile"
-                    className="block px-4 py-2 text-sm text-neutral-900 hover:bg-neutral-300 transition-colors"
+                    className="block px-4 py-2 text-sm text-text-inverse hover:bg-neutral-300 transition-colors"
                     onClick={() => setIsProfileDropdownOpen(false)}
                   >
                     Profile
                   </Link>
                   <button
                     type="button"
-                    className="block w-full text-left px-4 py-2 text-sm text-neutral-900 hover:bg-neutral-300 transition-colors"
+                    className="block w-full text-left px-4 py-2 text-sm text-text-inverse hover:bg-neutral-300 transition-colors"
                     onClick={() => {
                       setIsProfileDropdownOpen(false);
                       // Logout logic will be added later
@@ -116,7 +113,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="bg-neutral-900 min-h-[calc(100vh-36px)] sm:min-h-[calc(100vh-40px)]">
+      <main className="bg-neutral-800 min-h-[calc(100vh-36px)] sm:min-h-[calc(100vh-40px)]">
         {/* Container matches Figma: 1360px width with responsive padding */}
         <div className="max-w-[1360px] mx-auto px-3 sm:px-4 md:px-6 lg:px-10">
           {children}

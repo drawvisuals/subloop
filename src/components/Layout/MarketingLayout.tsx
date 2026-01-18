@@ -33,9 +33,9 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white">
+    <div className="min-h-screen bg-neutral-800 text-text-primary">
       {/* Header */}
-      <header className="bg-neutral-900 h-16 border-b border-neutral-700 sticky top-0 z-30">
+      <header className="pt-8 h-16 sticky top-0 z-30">
         <nav className="max-w-[1360px] mx-auto px-4 sm:px-10 h-full flex items-center justify-between relative">
           {/* Logo - left side */}
           <Link
@@ -51,33 +51,21 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
             <a
               href="#features"
               onClick={(e) => handleAnchorClick(e, 'features')}
-              className={`h-7 px-3 pb-3 flex items-center font-medium text-base leading-4 text-white transition-colors border-b-2 ${
-                hash === '#features' || hash === ''
-                  ? 'border-white'
-                  : 'border-transparent hover:text-white/80'
-              }`}
+              className="h-7 px-3 flex items-center font-medium text-base leading-4 text-neutral-100 hover:text-foundation-white transition-colors"
             >
               Features
             </a>
             <a
               href="#pricing"
               onClick={(e) => handleAnchorClick(e, 'pricing')}
-              className={`h-7 px-3 pb-3 flex items-center font-medium text-base leading-4 text-white transition-colors border-b-2 ${
-                hash === '#pricing'
-                  ? 'border-white'
-                  : 'border-transparent hover:text-white/80'
-              }`}
+              className="h-7 px-3 flex items-center font-medium text-base leading-4 text-neutral-100 hover:text-foundation-white transition-colors"
             >
               Pricing
             </a>
             <a
               href="#faq"
               onClick={(e) => handleAnchorClick(e, 'faq')}
-              className={`h-7 px-3 pb-3 flex items-center font-medium text-base leading-4 text-white transition-colors border-b-2 ${
-                hash === '#faq'
-                  ? 'border-white'
-                  : 'border-transparent hover:text-white/80'
-              }`}
+              className="h-7 px-3 flex items-center font-medium text-base leading-4 text-neutral-100 hover:text-foundation-white transition-colors"
             >
               FAQ
             </a>
@@ -87,16 +75,13 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
           <div className="flex items-center gap-2 sm:gap-4 shrink-0 ml-auto">
             <Link
               to="/auth/login"
-              className="px-3 sm:px-4 py-2 text-sm font-medium text-neutral-700 hover:text-white/80 transition-colors"
+              className="px-3 sm:px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary/80 transition-colors"
             >
               Log in
             </Link>
             <Link
               to="/#pricing"
-              className="relative h-8 w-[90px] px-4 py-1.5 rounded-lg flex items-center justify-center font-semibold text-sm leading-5 text-white overflow-hidden"
-              style={{
-                backgroundImage: 'linear-gradient(250.87deg, #1EBBE6 9.18%, #1F36E6 87.99%)',
-              }}
+              className="relative h-8 w-[90px] px-4 py-1.5 rounded-lg flex items-center justify-center font-semibold text-sm leading-5 text-text-primary overflow-hidden bg-gradient-to-r from-brand-primary-500 to-brand-secondary-500 hover:from-brand-secondary-500 hover:to-brand-primary-500 transition-all"
             >
               <span className="relative z-10">Get Pro</span>
               <div className="absolute inset-0 rounded-[inherit] pointer-events-none shadow-[inset_0px_1px_2px_0px_rgba(146,231,255,0.5)]" />
@@ -106,7 +91,7 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="bg-neutral-900 min-h-[calc(100vh-64px)]">
+      <main className="bg-neutral-800 min-h-[calc(100vh-64px)]">
         <div className="max-w-[1360px] mx-auto px-4 sm:px-10">
           {children}
         </div>
@@ -126,25 +111,25 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
                 >
                   <Logo className="h-9 w-auto" showText={true} />
                 </Link>
-                <p className="font-normal text-base leading-[22px] text-white tracking-tight">
+                <p className="font-normal text-base leading-[22px] text-text-primary tracking-tight">
                   Subscriptions, finally under control.
                 </p>
               </div>
-              <p className="font-normal text-[13px] leading-4 text-neutral-700">
+              <p className="font-normal text-[13px] leading-4 text-text-secondary">
                 © {new Date().getFullYear()} Subloop. All rights reserved.
               </p>
             </div>
 
             {/* Product Links */}
             <div className="flex-[1_0_0] flex flex-col gap-6 items-start font-normal text-base">
-              <p className="leading-[22px] text-white tracking-tight">Product</p>
+              <p className="leading-[22px] text-text-primary tracking-tight">Product</p>
               <a
                 href="#features"
                 onClick={(e) => {
                   e.preventDefault();
                   document.getElementById('features')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
-                className="leading-4 text-neutral-700 hover:text-white/80 transition-colors"
+                className="leading-4 text-text-secondary hover:text-text-primary/80 transition-colors"
               >
                 Features
               </a>
@@ -154,7 +139,7 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
                   e.preventDefault();
                   document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
-                className="leading-4 text-neutral-700 hover:text-white/80 transition-colors"
+                className="leading-4 text-text-secondary hover:text-text-primary/80 transition-colors"
               >
                 Pricing
               </a>
@@ -164,7 +149,7 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
                   e.preventDefault();
                   document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
-                className="leading-4 text-neutral-700 hover:text-white/80 transition-colors"
+                className="leading-4 text-text-secondary hover:text-text-primary/80 transition-colors"
               >
                 FAQ
               </a>
@@ -172,24 +157,24 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
 
             {/* Legal Links */}
             <div className="flex flex-col gap-6 items-start font-normal text-base w-[322px]">
-              <p className="leading-[22px] text-white tracking-tight">Legal</p>
+              <p className="leading-[22px] text-text-primary tracking-tight">Legal</p>
               <a
                 href="#"
-                className="leading-4 text-neutral-700 hover:text-white/80 transition-colors"
+                className="leading-4 text-text-secondary hover:text-text-primary/80 transition-colors"
                 onClick={(e) => e.preventDefault()}
               >
                 Privacy Policy
               </a>
               <a
                 href="#"
-                className="leading-4 text-neutral-700 hover:text-white/80 transition-colors"
+                className="leading-4 text-text-secondary hover:text-text-primary/80 transition-colors"
                 onClick={(e) => e.preventDefault()}
               >
                 Terms and Conditions
               </a>
               <a
                 href="mailto:support@usesubloop.com"
-                className="leading-4 text-neutral-700 hover:text-white/80 transition-colors"
+                className="leading-4 text-text-secondary hover:text-text-primary/80 transition-colors"
               >
                 Contact
               </a>

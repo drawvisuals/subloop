@@ -33,20 +33,20 @@ export function Input({
 	return (
 		<div className={`flex flex-col gap-2 items-start w-full ${className}`}>
 			{/* Label */}
-			<label htmlFor={inputId} className="h-4 leading-[22px] text-neutral-700 text-base tracking-tight whitespace-pre-wrap">
+			<label htmlFor={inputId} className="h-4 leading-normal text-text-secondary text-base tracking-tight whitespace-pre-wrap">
 				{label}
 			</label>
 
 			{/* Input Container */}
-			<div className={`relative w-full bg-neutral-50 border-2 rounded-lg overflow-hidden ${error
+			<div className={`relative w-full bg-neutral-900 border-2 rounded-lg overflow-hidden ${error
 					? 'border-danger-500'
-					: 'border-neutral-200 focus-within:border-brand-primary-500'
+					: 'border-neutral-700 focus-within:border-brand-primary-500'
 				}`}>
 				<input
 					{...props}
 					id={inputId}
 					type={inputType}
-					className="w-full h-[62px] px-4 py-5 bg-transparent text-white text-base leading-[22px] tracking-tight placeholder:text-neutral-700 focus:outline-none rounded-lg"
+					className="w-full h-[62px] px-4 py-5 bg-transparent text-text-primary text-base leading-normal tracking-tight placeholder:text-text-secondary focus:outline-none rounded-lg"
 					aria-invalid={error ? 'true' : undefined}
 					aria-describedby={error ? errorId : undefined}
 				/>
@@ -56,7 +56,7 @@ export function Input({
 					<button
 						type="button"
 						onClick={() => setShowPassword(!showPassword)}
-						className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-700 hover:text-white transition-colors"
+						className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors"
 						aria-label={showPassword ? 'Hide password' : 'Show password'}
 					>
 						{showPassword ? (
@@ -70,7 +70,7 @@ export function Input({
 
 			{/* Error Message */}
 			{error && (
-				<p id={errorId} className="text-sm text-danger-500 leading-[22px]" role="alert">
+				<p id={errorId} className="text-sm text-text-danger leading-normal" role="alert">
 					{error}
 				</p>
 			)}
