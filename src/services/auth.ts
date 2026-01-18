@@ -79,6 +79,7 @@ export async function mockSignup(email: string, password: string): Promise<{ suc
   // Store current session
   if (typeof window !== 'undefined') {
     sessionStorage.setItem('subloop_current_user', email);
+    setAuthProvider('email');
   }
 
   return { success: true };
@@ -102,6 +103,7 @@ export async function mockLogin(email: string, password: string): Promise<{ succ
   // Store current session
   if (typeof window !== 'undefined') {
     sessionStorage.setItem('subloop_current_user', email);
+    setAuthProvider('email');
   }
 
   return { success: true };
@@ -113,6 +115,7 @@ export async function mockLogin(email: string, password: string): Promise<{ succ
 export function mockLogout(): void {
   if (typeof window !== 'undefined') {
     sessionStorage.removeItem('subloop_current_user');
+    sessionStorage.removeItem('subloop_auth_provider');
   }
 }
 
@@ -130,4 +133,127 @@ export function isAuthenticated(): boolean {
 export function getCurrentUser(): string | null {
   if (typeof window === 'undefined') return null;
   return sessionStorage.getItem('subloop_current_user');
+}
+
+/**
+ * Get current user's auth provider
+ */
+export function getAuthProvider(): 'google' | 'microsoft' | 'email' | null {
+  if (typeof window === 'undefined') return null;
+  return (sessionStorage.getItem('subloop_auth_provider') as 'google' | 'microsoft' | 'email') || null;
+}
+
+/**
+ * Set auth provider for current session
+ */
+export function setAuthProvider(provider: 'google' | 'microsoft' | 'email'): void {
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem('subloop_auth_provider', provider);
+  }
+}
+
+/**
+ * Mock Google OAuth login
+ * In production, this would use Google OAuth flow
+ */
+export async function mockGoogleLogin(): Promise<{ success: boolean; email?: string; error?: string }> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  // Mock: For demo purposes
+  // In production, this would:
+  // 1. Redirect to Google OAuth
+  // 2. Get authorization code
+  // 3. Exchange for access/refresh tokens
+  // 4. Get user email from Google API
+
+  if (typeof window === 'undefined') {
+    return { success: false, error: 'Not available' };
+  }
+
+  // Get existing user email if already logged in (preserve account identity)
+  let accountEmail = sessionStorage.getItem('subloop_current_user');
+
+  // If no existing session, check if there's a mock user we should use
+  // (e.g., if they previously logged in with email/password)
+  if (!accountEmail) {
+    const mockUsers = getMockUsers();
+    // Use the default test user email if available
+    if (mockUsers.length > 0) {
+      accountEmail = mockUsers[0].email;
+    } else {
+      accountEmail = 'ze_casal@hotmail.com';
+    }
+  }
+
+  // Mock Gmail email for the Google account (for scanning)
+  // In production, this would come from Google OAuth user info
+  // The Gmail email can be different from the account email
+  const gmailEmail = accountEmail.includes('@')
+    ? accountEmail.replace(/@.*$/, '@gmail.com')
+    : `${accountEmail}@gmail.com`;
+
+  // Store session with account email (not Gmail email)
+  sessionStorage.setItem('subloop_current_user', accountEmail);
+  setAuthProvider('google');
+
+  // Import here to avoid circular dependency
+  const { createEmailConnection } = await import('./emailConnectionsStorage');
+
+  // Automatically create Gmail connection with Gmail email and mock tokens
+  const mockAccessToken = `google_access_token_${Date.now()}`;
+  const mockRefreshToken = `google_refresh_token_${Date.now()}`;
+  const expiresAt = new Date(Date.now() + 3600 * 1000).toISOString(); // 1 hour from now
+
+  createEmailConnection(
+    'gmail',
+    gmailEmail, // Gmail email for scanning
+    mockAccessToken,
+    mockRefreshToken,
+    expiresAt
+  );
+
+  return { success: true, email: accountEmail };
+}
+
+/**
+ * Mock Microsoft OAuth login
+ * In production, this would use Microsoft OAuth flow
+ */
+export async function mockMicrosoftLogin(): Promise<{ success: boolean; email?: string; error?: string }> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  // Mock: For demo purposes, use a default Outlook account
+  // In production, this would:
+  // 1. Redirect to Microsoft OAuth
+  // 2. Get authorization code
+  // 3. Exchange for access/refresh tokens
+  // 4. Get user email from Microsoft Graph API
+
+  const mockEmail = 'ze_casal@outlook.com'; // Mock Outlook address
+
+  // Store session
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem('subloop_current_user', mockEmail);
+    setAuthProvider('microsoft');
+
+    // Import here to avoid circular dependency
+    const { createEmailConnection } = await import('./emailConnectionsStorage');
+
+    // Automatically create Outlook connection with mock tokens
+    const mockAccessToken = `microsoft_access_token_${Date.now()}`;
+    const mockRefreshToken = `microsoft_refresh_token_${Date.now()}`;
+    const expiresAt = new Date(Date.now() + 3600 * 1000).toISOString(); // 1 hour from now
+
+    createEmailConnection(
+      'outlook',
+      mockEmail,
+      mockAccessToken,
+      mockRefreshToken,
+      expiresAt
+    );
+  }
+
+  return { success: true, email: mockEmail };
 }

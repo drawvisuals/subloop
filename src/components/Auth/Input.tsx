@@ -46,7 +46,7 @@ export function Input({
 					{...props}
 					id={inputId}
 					type={inputType}
-					className="w-full h-[62px] px-4 py-5 bg-transparent text-text-primary text-base leading-normal tracking-tight placeholder:text-text-secondary focus:outline-none rounded-lg"
+					className="w-full h-[62px] px-4 py-5 bg-neutral-900 text-text-primary text-base leading-normal tracking-tight placeholder:text-text-secondary focus:outline-none rounded-lg"
 					aria-invalid={error ? 'true' : undefined}
 					aria-describedby={error ? errorId : undefined}
 				/>

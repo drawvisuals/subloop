@@ -1,7 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useGoogleLogin } from '@react-oauth/google';
 import { MarketingLayout } from '@/components/Layout';
 import { ChromeIcon } from '@/components/ChromeIcon';
+import { markEmailConnected, markScanStarted } from '@/services/onboarding';
+import { handleGoogleAuthError } from '@/services/googleOAuthHelpers';
 import {
 	ScanText,
 	Globe,
@@ -13,7 +16,6 @@ import {
 	Plus,
 	ArrowRight,
 } from 'lucide-react';
-import { redirectToCheckout } from '@/services/stripe';
 
 interface FAQItem {
 	question: string;
@@ -52,7 +54,85 @@ const faqData: FAQItem[] = [
 ];
 
 export default function Landing() {
+	const navigate = useNavigate();
 	const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+	// TOKEN FLOW - gets access token directly in popup
+	const googleLogin = useGoogleLogin({
+		onSuccess: async (tokenResponse) => {
+			try {
+				console.log('Google OAuth token received:', { access_token: tokenResponse.access_token?.substring(0, 20) + '...' });
+
+				// Store access token in localStorage
+				if (tokenResponse.access_token) {
+					localStorage.setItem('google_access_token', tokenResponse.access_token);
+					// Store expiration timestamp (current time + expires_in seconds)
+					if (tokenResponse.expires_in) {
+						const expiresAt = Date.now() + (tokenResponse.expires_in * 1000);
+						localStorage.setItem('google_access_token_expires_at', expiresAt.toString());
+					}
+				}
+
+				// Get user info using the access token
+				const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+					headers: {
+						Authorization: `Bearer ${tokenResponse.access_token}`,
+					},
+				});
+
+				if (!userInfoResponse.ok) {
+					throw new Error('Failed to get user info from Google');
+				}
+
+				const userInfo = await userInfoResponse.json();
+				const email = userInfo.email;
+
+				if (!email) {
+					throw new Error('Email not found in Google user info');
+				}
+
+				sessionStorage.setItem('subloop_current_user', email);
+				const { setAuthProvider } = await import('@/services/auth');
+				setAuthProvider('google');
+
+				const { createEmailConnection } = await import('@/services/emailConnectionsStorage');
+				createEmailConnection(
+					'gmail',
+					email,
+					tokenResponse.access_token,
+					null, // No refresh token in token flow
+					new Date(Date.now() + (tokenResponse.expires_in || 3600) * 1000).toISOString()
+				);
+
+				markEmailConnected(1);
+				markScanStarted();
+				navigate('/onboarding/scanning');
+			} catch (error) {
+				console.error('OAuth error:', error);
+				alert(error instanceof Error ? error.message : 'Failed to process authentication');
+			}
+		},
+		onError: (error) => {
+			const errorMsg = handleGoogleAuthError(error);
+			let displayMsg = errorMsg;
+
+			if (errorMsg.includes('invalid_client') || errorMsg.includes('401')) {
+				displayMsg = `Invalid Google OAuth Client ID. Verify in Google Cloud Console:
+1. OAuth Client Type is "Web application"
+2. Authorized JavaScript origins: ${window.location.origin}
+3. Authorized redirect URIs: ${window.location.origin}
+4. Client ID matches exactly`;
+			}
+
+			alert(displayMsg);
+		},
+		// TOKEN FLOW - no redirect, gets token directly
+		scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly',
+	});
+
+	const handleConnectEmail = () => {
+		googleLogin();
+	};
 
 	const toggleFAQ = (index: number) => {
 		setOpenFaqIndex(openFaqIndex === index ? null : index);
@@ -79,14 +159,15 @@ export default function Landing() {
 					<div className="flex flex-col gap-4 sm:gap-4 items-center w-full px-4 sm:px-0">
 						{/* Buttons - stack on mobile, horizontal on tablet+ */}
 						<div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 items-stretch sm:items-start justify-center w-full sm:w-auto">
-							<Link to="/auth/signup" className="w-full sm:w-auto">
-								<button className="bg-foundation-white min-h-[44px] sm:h-[52px] w-full sm:w-auto sm:min-w-[200px] px-6 py-3 sm:py-4 rounded-xl flex gap-2 items-center justify-center hover:opacity-90 transition-opacity active:opacity-75">
-									<span className="font-semibold text-sm sm:text-base leading-normal text-text-inverse">
-										Connect your email
-									</span>
-									<ArrowRight className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-text-inverse shrink-0" />
-								</button>
-							</Link>
+							<button
+								onClick={handleConnectEmail}
+								className="bg-foundation-white min-h-[44px] sm:h-[52px] w-full sm:w-auto sm:min-w-[200px] px-6 py-3 sm:py-4 rounded-xl flex gap-2 items-center justify-center hover:opacity-90 transition-opacity active:opacity-75"
+							>
+								<span className="font-semibold text-sm sm:text-base leading-normal text-text-inverse">
+									Connect your email
+								</span>
+								<ArrowRight className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-text-inverse shrink-0" />
+							</button>
 							<button
 								onClick={() => window.location.href = 'https://chrome.google.com/webstore'}
 								className="bg-brand-secondary-500 min-h-[44px] sm:h-[52px] w-full sm:w-auto sm:min-w-[200px] px-6 py-3 sm:py-4 rounded-xl flex gap-2 items-center justify-center hover:opacity-90 transition-opacity active:opacity-75"
@@ -438,15 +519,15 @@ export default function Landing() {
 								</div>
 
 								{/* Button */}
-								<button
-									onClick={() => redirectToCheckout('pro-yearly')}
+								<a
+									href="#pricing"
 									className="w-full min-h-[44px] sm:h-[52px] px-6 py-3 sm:py-4 rounded-xl flex items-center justify-center active:opacity-75 relative overflow-hidden mt-auto bg-gradient-to-r from-brand-primary-500 to-brand-secondary-500 hover:from-brand-secondary-500 hover:to-brand-primary-500 transition-all"
 								>
 									<span className="font-semibold text-sm sm:text-base leading-normal text-text-primary relative z-10">
 										Get Pro
 									</span>
 									<div className="absolute inset-0 rounded-[inherit] pointer-events-none shadow-[inset_0px_1px_2px_0px_rgba(146,231,255,0.5)]" />
-								</button>
+								</a>
 							</div>
 						</div>
 					</div>

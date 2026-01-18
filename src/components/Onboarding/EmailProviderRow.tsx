@@ -6,6 +6,7 @@ interface EmailProviderRowProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
   comingSoon?: boolean;
+  disabled?: boolean;
 }
 
 /**
@@ -16,7 +17,8 @@ export function EmailProviderRow({
   provider,
   checked,
   onChange,
-  comingSoon = false
+  comingSoon = false,
+  disabled = false
 }: EmailProviderRowProps) {
   const providerLabels: Record<string, string> = {
     gmail: 'Connect Gmail',
@@ -48,7 +50,7 @@ export function EmailProviderRow({
       <Toggle
         checked={checked}
         onChange={onChange}
-        disabled={comingSoon}
+        disabled={comingSoon || disabled}
       />
     </div>
   );

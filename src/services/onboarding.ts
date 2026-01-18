@@ -4,6 +4,7 @@
  */
 
 import { getCurrentUser } from './auth';
+import { getSubscriptionCount } from './subscriptionsStorage';
 
 export interface OnboardingState {
   emailConnectedCount: number;
@@ -77,7 +78,25 @@ export function updateOnboardingState(updates: Partial<OnboardingState>): void {
 }
 
 /**
+ * Check if user has email token (Gmail/Outlook access token)
+ */
+function hasEmailToken(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  // Check for Google access token
+  const googleToken = localStorage.getItem('google_access_token');
+  if (googleToken) return true;
+
+  // TODO: Check for Outlook token when implemented
+  // const outlookToken = localStorage.getItem('outlook_access_token');
+  // if (outlookToken) return true;
+
+  return false;
+}
+
+/**
  * Determine post-auth redirect route based on onboarding state
+ * Enforces: no token + no scan → /onboarding/email-scan
  */
 export function getPostAuthRedirect(): string {
   const state = getOnboardingState();
@@ -86,7 +105,6 @@ export function getPostAuthRedirect(): string {
   let subscriptionCount = 0;
   if (typeof window !== 'undefined') {
     try {
-      const { getSubscriptionCount } = require('./subscriptionsStorage');
       subscriptionCount = getSubscriptionCount();
     } catch (error) {
       // If storage service not available yet, assume 0
@@ -94,14 +112,26 @@ export function getPostAuthRedirect(): string {
     }
   }
 
-  // If no emails connected and no subscriptions, go to email scan
-  if (state.emailConnectedCount === 0 && subscriptionCount === 0) {
+  // Check if user has email token
+  const hasToken = hasEmailToken();
+
+  // If no email token and scan not complete → must connect email first
+  if (!hasToken && state.scanStatus !== 'complete') {
+    return '/onboarding/email-scan';
+  }
+
+  // If no emails connected (according to state) and no subscriptions, go to email scan
+  if (state.emailConnectedCount === 0 && subscriptionCount === 0 && !hasToken) {
     return '/onboarding/email-scan';
   }
 
   // If emails connected but scan not completed, go to scanning
-  if (state.emailConnectedCount > 0 && state.scanStatus !== 'complete') {
+  if ((state.emailConnectedCount > 0 || hasToken) && state.scanStatus !== 'complete') {
     if (state.scanStatus === 'in_progress') {
+      return '/onboarding/scanning';
+    }
+    // If token exists but scan not started, start scanning
+    if (hasToken && state.scanStatus === 'not_started') {
       return '/onboarding/scanning';
     }
     return '/onboarding/email-scan';

@@ -25,13 +25,53 @@ npm install
 
 ### Environment Variables
 
-Create a `.env` file in the root directory:
+Create a `.env` file in the root directory (copy from `.env.example`):
 
 ```env
 # Stripe Publishable Key (Test Mode)
 # Get your test key from: https://dashboard.stripe.com/test/apikeys
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_test_key_here
+
+# Google OAuth Client ID (Required for Gmail signup/connection)
+# Get your client ID from: https://console.cloud.google.com/apis/credentials
+# See setup instructions below
+VITE_GOOGLE_CLIENT_ID=your_google_client_id_here.apps.googleusercontent.com
 ```
+
+#### Google OAuth Setup (Required for Gmail Signup)
+
+1. **Create a Google Cloud Project**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select an existing one
+
+2. **Enable Gmail API**
+   - Navigate to [APIs & Services > Library](https://console.cloud.google.com/apis/library)
+   - Search for "Gmail API" and enable it
+
+3. **Create OAuth Credentials**
+   - Go to [APIs & Services > Credentials](https://console.cloud.google.com/apis/credentials)
+   - Click "Create Credentials" > "OAuth client ID"
+   - If prompted, configure the OAuth consent screen first:
+     - User Type: External (for testing)
+     - App name: "Subloop"
+     - User support email: Your email
+     - Add scopes: `openid`, `email`, `profile`, `https://www.googleapis.com/auth/gmail.readonly`
+     - Add test users: Your email address
+   - Application type: **Web application**
+   - Name: "Subloop Web Client"
+   - Authorized redirect URIs:
+     - `http://localhost:3000/auth/google/callback` (for development)
+     - `https://yourdomain.com/auth/google/callback` (for production)
+   - Click "Create"
+   - Copy the **Client ID** (not the Client Secret - we don't need it in frontend)
+
+4. **Add to .env file**
+   - Open `.env` file in the project root
+   - Set `VITE_GOOGLE_CLIENT_ID` to your Client ID
+
+5. **Restart dev server**
+   - Stop the dev server (Ctrl+C)
+   - Run `npm run dev` again to load the new environment variable
 
 **Note:** The Stripe integration requires a backend API endpoint at `/api/create-checkout-session` to create checkout sessions securely. See "Stripe Integration" section below.
 

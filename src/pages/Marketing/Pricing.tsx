@@ -218,13 +218,13 @@ export default function Pricing() {
               </li>
             </ul>
 
-            <button
-              onClick={() => redirectToCheckout(billingCycle === 'monthly' ? 'pro-monthly' : 'pro-yearly')}
+            <Link
+              to="/#pricing"
               className="w-full min-h-[54px] px-6 py-4 rounded-lg flex items-center justify-center font-semibold text-base leading-normal text-text-primary overflow-hidden bg-gradient-to-r from-brand-primary-500 to-brand-secondary-500 hover:from-brand-secondary-500 hover:to-brand-primary-500 transition-all relative"
             >
               <span className="relative z-10">Get Pro</span>
               <div className="absolute inset-0 rounded-[inherit] pointer-events-none shadow-[inset_0px_1px_2px_0px_rgba(146,231,255,0.5)]" />
-            </button>
+            </Link>
           </div>
 
           {/* Lifetime Plan */}

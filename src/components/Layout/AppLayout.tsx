@@ -1,6 +1,8 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Logo } from './Logo';
+
+const PROFILE_STORAGE_KEY = 'subloop_profile_data';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -12,10 +14,47 @@ interface AppLayoutProps {
  */
 export function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState(false);
 
   const isSubscriptionsActive = location.pathname.startsWith('/app/subscriptions');
   const isSettingsActive = location.pathname.startsWith('/app/settings');
+
+  // Load profile photo from localStorage
+  const loadProfilePhoto = () => {
+    try {
+      const stored = localStorage.getItem(PROFILE_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.photoUrl) {
+          setProfilePhoto(parsed.photoUrl);
+          setPhotoError(false);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading profile photo:', error);
+    }
+    setProfilePhoto(null);
+  };
+
+  // Load profile photo on mount
+  useEffect(() => {
+    loadProfilePhoto();
+  }, []);
+
+  // Listen for profile updates (custom event dispatched from Profile page)
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      loadProfilePhoto();
+    };
+
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdate);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-neutral-800">
@@ -71,43 +110,26 @@ export function AppLayout({ children }: AppLayoutProps) {
               <div className="absolute inset-0 rounded-[inherit] pointer-events-none shadow-[inset_0px_1px_2px_0px_rgba(146,231,255,0.5)]" />
             </Link>
 
-            {/* Profile Avatar with Dropdown */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                className="w-7 h-7 sm:w-9 sm:h-9 rounded-full overflow-hidden relative focus:outline-none focus:ring-2 focus:ring-brand-primary-500 focus:ring-offset-2 focus:ring-offset-neutral-100 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
-                aria-label="User profile menu"
-                aria-expanded={isProfileDropdownOpen}
-              >
-                {/* Avatar placeholder - will be replaced with actual avatar */}
-                <div className="w-full h-full bg-gradient-to-br from-brand-primary-400 to-brand-secondary-400" />
-                <div className="absolute inset-0 bg-neutral-200/30" />
-              </button>
-
-              {/* Dropdown Menu */}
-              {isProfileDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-neutral-200 border border-neutral-700 rounded-lg shadow-lg py-1 z-50">
-                  <Link
-                    to="/app/profile"
-                    className="block px-4 py-2 text-sm text-text-inverse hover:bg-neutral-300 transition-colors"
-                    onClick={() => setIsProfileDropdownOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                  <button
-                    type="button"
-                    className="block w-full text-left px-4 py-2 text-sm text-text-inverse hover:bg-neutral-300 transition-colors"
-                    onClick={() => {
-                      setIsProfileDropdownOpen(false);
-                      // Logout logic will be added later
-                    }}
-                  >
-                    Log out
-                  </button>
-                </div>
+            {/* Profile Avatar - navigates to Profile page */}
+            <Link
+              to="/app/profile"
+              className="w-7 h-7 sm:w-9 sm:h-9 rounded-full overflow-hidden relative focus:outline-none focus:ring-2 focus:ring-brand-primary-500 focus:ring-offset-2 focus:ring-offset-neutral-900 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
+              aria-label="User profile"
+            >
+              {profilePhoto && !photoError ? (
+                <img
+                  src={profilePhoto}
+                  alt="User profile"
+                  className="w-full h-full object-cover"
+                  onError={() => setPhotoError(true)}
+                />
+              ) : (
+                <>
+                  <div className="w-full h-full bg-gradient-to-br from-brand-primary-400 to-brand-secondary-400" />
+                  <div className="absolute inset-0 bg-neutral-200/30" />
+                </>
               )}
-            </div>
+            </Link>
           </div>
         </nav>
       </header>
@@ -119,15 +141,6 @@ export function AppLayout({ children }: AppLayoutProps) {
           {children}
         </div>
       </main>
-
-      {/* Click outside to close dropdown */}
-      {isProfileDropdownOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setIsProfileDropdownOpen(false)}
-          aria-hidden="true"
-        />
-      )}
     </div>
   );
 }

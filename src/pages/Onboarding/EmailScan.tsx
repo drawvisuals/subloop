@@ -1,9 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGoogleLogin } from '@react-oauth/google';
 import { ScanText } from 'lucide-react';
 import { EmailProviderRow } from '@/components/Onboarding';
 import { Button } from '@/components/Auth';
 import { markEmailConnected, markScanStarted } from '@/services/onboarding';
+import { connectOutlook } from '@/services/oauth';
+import { getEmailConnectionByProvider } from '@/services/emailConnectionsStorage';
+import { getAuthProvider } from '@/services/auth';
+import { handleGoogleAuthError } from '@/services/googleOAuthHelpers';
+import { setAuthProvider } from '@/services/auth';
 
 /**
  * Connect and scan emails page
@@ -13,9 +19,153 @@ export default function EmailScan() {
 	const navigate = useNavigate();
 	const [gmailEnabled, setGmailEnabled] = useState(false);
 	const [outlookEnabled, setOutlookEnabled] = useState(false);
+	const [isConnecting, setIsConnecting] = useState<string | null>(null);
+	const [connectionErrors, setConnectionErrors] = useState<{ gmail?: string; outlook?: string }>({});
+
+	// TOKEN FLOW - gets access token directly in popup
+	const googleLogin = useGoogleLogin({
+		onSuccess: async (tokenResponse) => {
+			try {
+				console.log('Google OAuth token received:', { access_token: tokenResponse.access_token?.substring(0, 20) + '...' });
+
+				// Store access token in localStorage
+				if (tokenResponse.access_token) {
+					localStorage.setItem('google_access_token', tokenResponse.access_token);
+					// Store expiration timestamp (current time + expires_in seconds)
+					if (tokenResponse.expires_in) {
+						const expiresAt = Date.now() + (tokenResponse.expires_in * 1000);
+						localStorage.setItem('google_access_token_expires_at', expiresAt.toString());
+					}
+				}
+
+				// Get user info using the access token
+				const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+					headers: {
+						Authorization: `Bearer ${tokenResponse.access_token}`,
+					},
+				});
+
+				if (!userInfoResponse.ok) {
+					throw new Error('Failed to get user info from Google');
+				}
+
+				const userInfo = await userInfoResponse.json();
+				const email = userInfo.email;
+
+				if (!email) {
+					throw new Error('Email not found in Google user info');
+				}
+
+				sessionStorage.setItem('subloop_current_user', email);
+				setAuthProvider('google');
+
+				const { createEmailConnection } = await import('@/services/emailConnectionsStorage');
+				createEmailConnection(
+					'gmail',
+					email,
+					tokenResponse.access_token,
+					null, // No refresh token in token flow
+					new Date(Date.now() + (tokenResponse.expires_in || 3600) * 1000).toISOString()
+				);
+
+				setGmailEnabled(true);
+				setIsConnecting(null);
+				markEmailConnected(1);
+				markScanStarted();
+				navigate('/onboarding/scanning');
+			} catch (error) {
+				console.error('OAuth error:', error);
+				setConnectionErrors(prev => ({
+					...prev,
+					gmail: error instanceof Error ? error.message : 'Failed to connect Gmail',
+				}));
+				setIsConnecting(null);
+			}
+		},
+		onError: (error) => {
+			const errorMsg = handleGoogleAuthError(error);
+			let displayMsg = errorMsg;
+
+			if (errorMsg.includes('invalid_client') || errorMsg.includes('401')) {
+				displayMsg = `Invalid Client ID. Verify in Google Cloud Console:
+- Authorized JavaScript origins: ${window.location.origin}
+- Authorized redirect URIs: ${window.location.origin}
+- Client ID matches exactly`;
+			}
+
+			setConnectionErrors(prev => ({
+				...prev,
+				gmail: displayMsg,
+			}));
+			setIsConnecting(null);
+		},
+		// TOKEN FLOW - no redirect, gets token directly
+		scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly',
+	});
+
+	// Check if connections already exist on mount
+	useEffect(() => {
+		const gmailConn = getEmailConnectionByProvider('gmail');
+		const outlookConn = getEmailConnectionByProvider('outlook');
+
+		setGmailEnabled(!!gmailConn);
+		setOutlookEnabled(!!outlookConn);
+
+		// Auto-connect if user logged in with Google/Microsoft
+		const authProvider = getAuthProvider();
+		if (authProvider === 'google' && !gmailConn) {
+			handleProviderToggle('gmail', true);
+		} else if (authProvider === 'microsoft' && !outlookConn) {
+			handleProviderToggle('outlook', true);
+		}
+	}, []);
+
+	const handleProviderToggle = async (provider: 'gmail' | 'outlook', checked: boolean) => {
+		if (!checked) {
+			// Disconnect (just uncheck locally, actual disconnect handled in Settings)
+			if (provider === 'gmail') {
+				setGmailEnabled(false);
+			} else {
+				setOutlookEnabled(false);
+			}
+			return;
+		}
+
+		// Gmail uses Google OAuth hook
+		if (provider === 'gmail') {
+			setIsConnecting('gmail');
+			setConnectionErrors(prev => ({ ...prev, gmail: undefined }));
+			googleLogin(); // Call the hook's function
+			return;
+		}
+
+		// Outlook connection (mock for now)
+		setIsConnecting(provider);
+		setConnectionErrors(prev => ({ ...prev, [provider]: undefined }));
+
+		try {
+			const result = await connectOutlook();
+
+			if (result.success) {
+				setOutlookEnabled(true);
+			} else {
+				setConnectionErrors(prev => ({
+					...prev,
+					[provider]: result.error || 'Failed to connect',
+				}));
+			}
+		} catch (error) {
+			setConnectionErrors(prev => ({
+				...prev,
+				[provider]: 'An error occurred. Please try again.',
+			}));
+		} finally {
+			setIsConnecting(null);
+		}
+	};
 
 	const handleScanEmails = () => {
-		// Update onboarding state
+		// Update onboarding state based on actual connections
 		const connectedCount = (gmailEnabled ? 1 : 0) + (outlookEnabled ? 1 : 0);
 		markEmailConnected(connectedCount);
 		markScanStarted();
@@ -57,17 +207,35 @@ export default function EmailScan() {
 
 				{/* Email Providers Container */}
 				<div className="w-full bg-neutral-900 rounded-xl sm:rounded-2xl p-4 sm:p-5 flex flex-col gap-4 sm:gap-5 items-center">
-					<EmailProviderRow
-						provider="gmail"
-						checked={gmailEnabled}
-						onChange={setGmailEnabled}
-					/>
+					<div className="w-full flex flex-col gap-2">
+						<EmailProviderRow
+							provider="gmail"
+							checked={gmailEnabled}
+							onChange={(checked) => handleProviderToggle('gmail', checked)}
+							disabled={isConnecting === 'gmail'}
+						/>
+						{connectionErrors.gmail && (
+							<p className="text-xs text-text-danger ml-6">{connectionErrors.gmail}</p>
+						)}
+						{isConnecting === 'gmail' && (
+							<p className="text-xs text-text-secondary ml-6">Connecting...</p>
+						)}
+					</div>
 
-					<EmailProviderRow
-						provider="outlook"
-						checked={outlookEnabled}
-						onChange={setOutlookEnabled}
-					/>
+					<div className="w-full flex flex-col gap-2">
+						<EmailProviderRow
+							provider="outlook"
+							checked={outlookEnabled}
+							onChange={(checked) => handleProviderToggle('outlook', checked)}
+							disabled={isConnecting === 'outlook'}
+						/>
+						{connectionErrors.outlook && (
+							<p className="text-xs text-text-danger ml-6">{connectionErrors.outlook}</p>
+						)}
+						{isConnecting === 'outlook' && (
+							<p className="text-xs text-text-secondary ml-6">Connecting...</p>
+						)}
+					</div>
 
 					<EmailProviderRow
 						provider="icloud"

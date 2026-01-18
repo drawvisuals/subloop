@@ -100,14 +100,14 @@ export default function SubscriptionsList() {
 	}, []);
 
 	const statusOptions = [
-		{ value: '', label: 'Status' },
+		{ value: '', label: 'State: All' },
 		{ value: 'Active', label: 'Active' },
 		{ value: 'Inactive', label: 'Inactive' },
 		{ value: 'Review', label: 'Review' },
 	];
 
 	const paymentMethodOptions = [
-		{ value: '', label: 'Payment method' },
+		{ value: '', label: 'Payment: All' },
 		{ value: 'Visa', label: 'Visa' },
 		{ value: 'PayPal', label: 'PayPal' },
 		{ value: 'Apple Pay', label: 'Apple Pay' },
