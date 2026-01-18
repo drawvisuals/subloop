@@ -1,4 +1,5 @@
 import { InputHTMLAttributes, useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -34,7 +35,7 @@ export function Input({
       </label>
 
       {/* Input Container */}
-      <div className={`relative w-full bg-neutral-50 border-2 rounded-lg ${
+      <div className={`relative w-full bg-neutral-50 border-2 rounded-lg overflow-hidden ${
         error
           ? 'border-danger-500'
           : 'border-neutral-200 focus-within:border-brand-primary-500'
@@ -42,7 +43,7 @@ export function Input({
           <input
             {...props}
             type={inputType}
-            className="w-full h-[62px] px-4 py-5 bg-transparent text-white text-base leading-[22px] tracking-tight placeholder:text-neutral-700 focus:outline-none"
+            className="w-full h-[62px] px-4 py-5 bg-transparent text-white text-base leading-[22px] tracking-tight placeholder:text-neutral-700 focus:outline-none rounded-lg"
           />
 
         {/* Password Toggle */}
@@ -50,11 +51,14 @@ export function Input({
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-700 hover:text-white transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-700 hover:text-white transition-colors"
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
-            {/* Eye icon placeholder - will be replaced with actual icon */}
-            <div className="w-4 h-4 bg-neutral-700" />
+            {showPassword ? (
+              <EyeOff className="w-4 h-4" />
+            ) : (
+              <Eye className="w-4 h-4" />
+            )}
           </button>
         )}
       </div>

@@ -1,145 +1,166 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { GoogleButton, Input, Divider, Button } from '@/components/Auth';
+import { mockSignup } from '@/services/auth';
 
 /**
  * Create Account page
  * Matches Figma design exactly with proper spacing, typography, and colors
  */
-export function SignUp() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export default function SignUp() {
+	const navigate = useNavigate();
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validateEmail = (value: string): string | undefined => {
-    if (!value) {
-      return 'Email address is required';
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(value)) {
-      return 'Please enter a valid email address';
-    }
-    return undefined;
-  };
+	const validateEmail = (value: string): string | undefined => {
+		if (!value) {
+			return 'Email address is required';
+		}
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(value)) {
+			return 'Please enter a valid email address';
+		}
+		return undefined;
+	};
 
-  const validatePassword = (value: string): string | undefined => {
-    if (!value) {
-      return 'Password is required';
-    }
-    if (value.length < 8) {
-      return 'Password must be at least 8 characters';
-    }
-    return undefined;
-  };
+	const validatePassword = (value: string): string | undefined => {
+		if (!value) {
+			return 'Password is required';
+		}
+		if (value.length < 8) {
+			return 'Password must be at least 8 characters';
+		}
+		return undefined;
+	};
 
-  const handleGoogleAuth = () => {
-    // Mock Google OAuth - will be implemented later
-    console.log('Google OAuth clicked');
-  };
+	const handleGoogleAuth = () => {
+		// Mock Google OAuth - will be implemented later
+		console.log('Google OAuth clicked');
+	};
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
 
-    const emailError = validateEmail(email);
-    const passwordError = validatePassword(password);
+		const emailError = validateEmail(email);
+		const passwordError = validatePassword(password);
 
-    if (emailError || passwordError) {
-      setErrors({
-        email: emailError,
-        password: passwordError,
-      });
-      return;
-    }
+		if (emailError || passwordError) {
+			setErrors({
+				email: emailError,
+				password: passwordError,
+			});
+			return;
+		}
 
-    setErrors({});
-    setIsSubmitting(true);
+		setErrors({});
+		setIsSubmitting(true);
 
-    // Mock signup - will be implemented later
-    setTimeout(() => {
-      setIsSubmitting(false);
-      console.log('Signup submitted:', { email, password });
-    }, 1000);
-  };
+		try {
+			const result = await mockSignup(email, password);
 
-  return (
-    <div className="min-h-screen bg-neutral-50 flex items-center justify-center px-10 py-20">
-      {/* Container matching Figma: 438px width, centered */}
-      <div className="w-full max-w-[438px] flex flex-col gap-8 items-center">
-        {/* Title */}
-        <h1 className="font-semibold h-[39px] leading-9 text-[30px] text-center text-white tracking-tight whitespace-pre-wrap w-full">
-          Create your account
-        </h1>
+			if (result.success) {
+				// Redirect to subscriptions page
+				setIsSubmitting(false);
+				navigate('/app/subscriptions');
+			} else {
+				setErrors({ general: result.error || 'Failed to create account' });
+				setIsSubmitting(false);
+			}
+		} catch (error) {
+			setErrors({ general: 'An error occurred. Please try again.' });
+			setIsSubmitting(false);
+		}
+	};
 
-        {/* Google OAuth Button */}
-        <GoogleButton onClick={handleGoogleAuth}>
-          Sign up with Google
-        </GoogleButton>
+	return (
+		<div className="min-h-screen bg-neutral-900 flex items-center justify-center px-10 py-20">
+			{/* Container matching Figma: 438px width, centered */}
+			<div className="w-full max-w-[438px] flex flex-col gap-8 items-center">
+				{/* Title */}
+				<h1 className="font-semibold h-[39px] leading-9 text-[30px] text-center text-white tracking-tight whitespace-pre-wrap w-full">
+					Create your account
+				</h1>
 
-        {/* Divider */}
-        <Divider />
+				{/* Google OAuth Button */}
+				<GoogleButton onClick={handleGoogleAuth}>
+					Sign up with Google
+				</GoogleButton>
 
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="w-full flex flex-col gap-6 items-start"
-        >
-          {/* Email Input */}
-          <Input
-            label="Email address"
-            type="email"
-            placeholder="Enter your email address"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (errors.email) {
-                setErrors({ ...errors, email: undefined });
-              }
-            }}
-            error={errors.email}
-          />
+				{/* Divider */}
+				<Divider />
 
-          {/* Password Input */}
-          <Input
-            label="Password"
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (errors.password) {
-                setErrors({ ...errors, password: undefined });
-              }
-            }}
-            showPasswordToggle
-            error={errors.password}
-          />
+				{/* Form */}
+				<form
+					onSubmit={handleSubmit}
+					className="w-full flex flex-col gap-6 items-start"
+				>
+					{/* Email Input */}
+					<Input
+						label="Email address"
+						type="email"
+						placeholder="Enter your email address"
+						value={email}
+						onChange={(e) => {
+							setEmail(e.target.value);
+							if (errors.email) {
+								setErrors({ ...errors, email: undefined });
+							}
+						}}
+						error={errors.email}
+					/>
 
-          {/* Submit Button */}
-          <div className="w-full flex flex-col gap-8 items-center">
-            <Button
-              type="submit"
-              showArrow
-              disabled={isSubmitting}
-            >
-              Create account
-            </Button>
+					{/* Password Input */}
+					<Input
+						label="Password"
+						type="password"
+						placeholder="Enter your password"
+						value={password}
+						onChange={(e) => {
+							setPassword(e.target.value);
+							if (errors.password) {
+								setErrors({ ...errors, password: undefined });
+							}
+						}}
+						showPasswordToggle
+						error={errors.password}
+					/>
 
-            {/* Link to Login */}
-            <div className="flex items-center">
-              <p className="font-normal leading-[22px] text-base text-white tracking-tight">
-                Already have an account?{' '}
-                <Link
-                  to="/auth/login"
-                  className="text-brand-primary-500 hover:text-brand-primary-400 transition-colors"
-                >
-                  Login
-                </Link>
-              </p>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+					{/* General Error Message */}
+					{errors.general && (
+						<div className="w-full p-4 bg-danger-500/10 border border-danger-500 rounded-lg">
+							<p className="text-sm text-danger-500 leading-[22px]">
+								{errors.general}
+							</p>
+						</div>
+					)}
+
+					{/* Submit Button */}
+					<div className="w-full flex flex-col gap-8 items-center">
+						<Button
+							type="submit"
+							showArrow
+							disabled={isSubmitting}
+						>
+							Create account
+						</Button>
+
+						{/* Link to Login */}
+						<div className="flex items-center">
+							<p className="font-normal leading-[22px] text-base text-white tracking-tight">
+								Already have an account?{' '}
+								<Link
+									to="/auth/login"
+									className="text-brand-primary-500 hover:text-brand-primary-400 transition-colors"
+								>
+									Login
+								</Link>
+							</p>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	);
 }
