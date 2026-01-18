@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Globe, ArrowRight, ShieldHalf } from 'lucide-react';
+import { Logo } from '@/components/Layout/Logo';
 
 /**
  * Browser extension onboarding page
@@ -24,22 +25,8 @@ export default function BrowserExtension() {
 	return (
 		<div className="min-h-screen bg-neutral-100 flex flex-col items-center justify-center px-10 py-8">
 			{/* Logo */}
-			<div className="flex gap-3 items-center justify-center mb-8">
-				{/* Logo icon with gradient */}
-				<div
-					className="w-9 h-9 rounded-lg relative shrink-0"
-					style={{
-						backgroundImage: 'linear-gradient(135.86deg, #1EBBE6 45.11%, #1E2FE6 91.65%)',
-					}}
-				>
-					<div className="absolute inset-0 rounded-[inherit] pointer-events-none shadow-[inset_0px_1px_2px_0px_rgba(255,255,255,0.5)]" />
-					{/* Logo placeholder - will be replaced with actual logo */}
-					<div className="absolute inset-0 flex items-center justify-center">
-						<div className="w-[18px] h-[18px] bg-white rounded-sm" />
-					</div>
-				</div>
-				{/* Logotype placeholder */}
-				<div className="h-5 w-[78px] bg-white/20 rounded" />
+			<div className="flex items-center justify-center mb-8">
+				<Logo className="h-9 w-auto" showText={true} />
 			</div>
 
 			{/* Main Content Container */}

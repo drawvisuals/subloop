@@ -8,18 +8,32 @@ A minimal subscription manager that helps users track their subscriptions.
 - **Vite** for build tooling
 - **Tailwind CSS** for styling (mapped to Figma tokens)
 - **React Router** for routing
+- **Stripe** for payments
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ and npm/yarn/pnpm
+- Stripe account (for payment integration)
 
 ### Installation
 
 ```bash
 npm install
 ```
+
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+# Stripe Publishable Key (Test Mode)
+# Get your test key from: https://dashboard.stripe.com/test/apikeys
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_test_key_here
+```
+
+**Note:** The Stripe integration requires a backend API endpoint at `/api/create-checkout-session` to create checkout sessions securely. See "Stripe Integration" section below.
 
 ### Development
 
@@ -48,25 +62,56 @@ src/
 ├── components/     # Reusable UI components
 │   └── Layout/    # Layout components (AppLayout, etc.)
 ├── config/        # Configuration files
-│   └── tokens.ts  # Figma design tokens (TODO: populate from Figma)
-├── pages/         # Page components (will be added as features are built)
-├── routes/        # Route definitions and guards
+│   └── tokens.ts  # Figma design tokens
+├── pages/         # Page components
+├── services/      # Service modules (auth, stripe)
 ├── types/         # TypeScript type definitions
 └── utils/         # Utility functions
-    └── accessibility.ts  # A11y helpers
 ```
+
+## Stripe Integration
+
+The app uses Stripe Checkout for payment processing. To complete the integration:
+
+1. **Backend API Endpoint Required**: Create a backend API endpoint at `/api/create-checkout-session` that:
+   - Accepts POST requests with `planType` (`pro-monthly`, `pro-yearly`, `lifetime`)
+   - Uses your Stripe secret key to create a Checkout Session
+   - Returns `{ sessionId: string, url: string }` where `url` is the Stripe Checkout URL
+
+2. **Example Backend Implementation** (Node.js/Express):
+   ```javascript
+   const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+   app.post('/api/create-checkout-session', async (req, res) => {
+     const { planType, successUrl, cancelUrl } = req.body;
+
+     const session = await stripe.checkout.sessions.create({
+       payment_method_types: ['card'],
+       line_items: [{
+         price_data: {
+           currency: 'usd',
+           product_data: { name: 'Subloop Pro' },
+           unit_amount: planType === 'lifetime' ? 19900 : planType === 'pro-yearly' ? 9000 : 900,
+           recurring: planType !== 'lifetime' ? {
+             interval: planType === 'pro-yearly' ? 'year' : 'month',
+           } : undefined,
+         },
+         quantity: 1,
+       }],
+       mode: planType === 'lifetime' ? 'payment' : 'subscription',
+       success_url: successUrl,
+       cancel_url: cancelUrl,
+     });
+
+     res.json({ sessionId: session.id, url: session.url });
+   });
+   ```
+
+3. **Test Cards**: Use Stripe test cards like `4242 4242 4242 4242` with any future expiry date and CVC.
 
 ## Design Tokens
 
-**Important:** Before implementing UI features, populate `src/config/tokens.ts` with actual Figma design tokens:
-
-- Colors
-- Typography (fonts, sizes, line heights)
-- Spacing scale
-- Border radius values
-- Shadows/elevation
-
-The UI must match Figma spacing, typography, colors, and hierarchy exactly (per PRD Section 3).
+All UI styling uses Figma design tokens from `src/config/tokens.ts`. The UI must match Figma spacing, typography, colors, and hierarchy exactly (per PRD Section 3).
 
 ## Development Guidelines
 

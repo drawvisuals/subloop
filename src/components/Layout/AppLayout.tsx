@@ -1,5 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Logo } from './Logo';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -24,26 +25,10 @@ export function AppLayout({ children }: AppLayoutProps) {
           {/* Logo - left side */}
           <Link
             to="/app/subscriptions"
-            className="flex items-center gap-3 h-9 shrink-0"
+            className="flex items-center h-9 shrink-0"
             aria-label="Subloop Home"
           >
-            {/* Logo icon - 36x36 with gradient background */}
-            <div
-              className="w-9 h-9 rounded-[10px] shrink-0 relative overflow-hidden"
-              style={{
-                backgroundImage: 'linear-gradient(135.86deg, #1EBBE6 45.11%, #1F36E6 91.65%)',
-              }}
-            >
-              <div className="absolute inset-0 rounded-[inherit] pointer-events-none shadow-[inset_0px_1px_2px_0px_rgba(255,255,255,0.5)]" />
-              {/* Logo SVG placeholder - will be replaced with actual logo */}
-              <div className="absolute inset-[9px] flex items-center justify-center">
-                <div className="w-[18px] h-[18px] bg-white/20 rounded-sm" />
-              </div>
-            </div>
-            {/* Logotype text */}
-            <span className="text-white text-xl font-medium leading-5 w-[78px] h-5">
-              Subloop
-            </span>
+            <Logo className="h-9 w-auto" showText={true} />
           </Link>
 
           {/* Navigation Links - centered */}
