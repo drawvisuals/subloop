@@ -1,45 +1,19 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { SubscriptionForm } from './SubscriptionForm';
+import { getSubscription, updateSubscription } from '@/services/subscriptionsStorage';
 
-// Mock subscription data - in production this would come from an API
-const mockSubscriptionData: Record<string, any> = {
-  '1': {
-    id: '1',
-    name: 'Netflix',
-    price: 24.99,
-    cycle: 'Monthly',
-    paymentMethod: 'Visa ****4567',
-    startedOn: new Date('2025-12-16'),
-    renewalDate: new Date('2026-01-16'),
-    status: 'Active',
-    notes: 'I want to see Stranger Things last season. Should cancel the subscription after finishing watching it.',
-    reminder: true,
-  },
-  '2': {
-    id: '2',
-    name: 'Spotify',
-    price: 143.88,
-    cycle: 'Annually',
-    paymentMethod: 'PayPal',
-    startedOn: new Date('2025-10-04'),
-    renewalDate: new Date('2026-10-04'),
-    status: 'Inactive',
-    notes: '',
-    reminder: true,
-  },
-  '7': {
-    id: '7',
-    name: 'Dropbox',
-    price: 119.88,
-    cycle: 'Annually',
-    paymentMethod: 'Unknown',
-    startedOn: new Date('2026-01-18'),
-    renewalDate: new Date('2027-01-18'),
-    status: 'Review',
-    notes: '',
-    reminder: true,
-  },
-};
+interface SubscriptionFormData {
+  name: string;
+  price: string;
+  currency: string;
+  cycle: 'Monthly' | 'Annually';
+  paymentMethod: string;
+  startedOn: string;
+  renewalDate: string;
+  reminder: boolean;
+  status: 'Active' | 'Inactive' | 'Review';
+  notes: string;
+}
 
 function formatDateForInput(date: Date | string | undefined): string {
   if (!date) return '';
@@ -51,9 +25,9 @@ export default function EditSubscription() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const subscription = id ? mockSubscriptionData[id] : null;
+  const subscription = id ? getSubscription(id) : null;
 
-  if (!subscription) {
+  if (!subscription || !id) {
     return (
       <div className="pt-12 pb-8">
         <p className="text-white">Subscription not found</p>
@@ -81,9 +55,21 @@ export default function EditSubscription() {
     notes: subscription.notes || '',
   };
 
-  const handleSubmit = (formData: any) => {
-    // Mock save logic - will be replaced with API call
-    console.log('Save subscription changes:', { id, ...formData });
+  const handleSubmit = (formData: SubscriptionFormData) => {
+    // Update subscription in storage
+    updateSubscription(id, {
+      name: formData.name,
+      price: parseFloat(formData.price),
+      currency: formData.currency,
+      cycle: formData.cycle,
+      paymentMethod: formData.paymentMethod,
+      startedOn: formData.startedOn ? new Date(formData.startedOn) : new Date(),
+      renewalDate: formData.renewalDate ? new Date(formData.renewalDate) : new Date(),
+      status: formData.status,
+      notes: formData.notes || '',
+      reminder: formData.reminder,
+    });
+
     navigate(`/app/subscription/${id}`);
   };
 

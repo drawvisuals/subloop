@@ -2,43 +2,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/Layout';
 import { Copy, PenLine, Trash2, Bell, TriangleAlert } from 'lucide-react';
 import { shouldBeInReviewState, getReviewReasons } from '@/utils/subscriptionHelpers';
-
-// Mock subscription data - in production this would come from an API
-const mockSubscriptionData: Record<string, any> = {
-	'1': {
-		id: '1',
-		name: 'Netflix',
-		price: 24.99,
-		cycle: 'Monthly',
-		paymentMethod: 'Visa ****4567',
-		startedOn: new Date('2025-12-16'),
-		renewalDate: new Date('2026-01-16'),
-		status: 'Active',
-		notes: 'I want to see Stranger Things last season. Should cancel the subscription after finishing watching it.',
-	},
-	'2': {
-		id: '2',
-		name: 'Spotify',
-		price: 143.88,
-		cycle: 'Annually',
-		paymentMethod: 'PayPal',
-		startedOn: new Date('2025-10-04'),
-		renewalDate: new Date('2026-10-04'),
-		status: 'Inactive',
-		notes: '',
-	},
-	'7': {
-		id: '7',
-		name: 'Dropbox',
-		price: 119.88,
-		cycle: 'Annually',
-		paymentMethod: 'Unknown',
-		startedOn: new Date('2026-01-18'),
-		renewalDate: new Date('2027-01-18'),
-		status: 'Review',
-		notes: '',
-	},
-};
+import { getSubscription, duplicateSubscription, deleteSubscription } from '@/services/subscriptionsStorage';
+import { useState } from 'react';
 
 function formatDate(date: Date): string {
 	return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -57,13 +22,14 @@ function getDaysUntilRenewal(date: Date): number {
 export default function SubscriptionDetail() {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-	const subscription = id ? mockSubscriptionData[id] : null;
+	const subscription = id ? getSubscription(id) : null;
 
-	if (!subscription) {
+	if (!subscription || !id) {
 		return (
 			<AppLayout>
-				<div className="pt-12 pb-8">
+				<div className="pt-6 sm:pt-8 md:pt-12 pb-6 sm:pb-8">
 					<p className="text-white">Subscription not found</p>
 					<Link to="/app/subscriptions" className="text-brand-primary-500 hover:text-brand-primary-400">
 						Back to subscriptions
@@ -73,38 +39,59 @@ export default function SubscriptionDetail() {
 		);
 	}
 
-	const daysUntilRenewal = getDaysUntilRenewal(subscription.renewalDate);
+	const renewalDate = subscription.renewalDate instanceof Date ? subscription.renewalDate : new Date(subscription.renewalDate);
+	const startedOn = subscription.startedOn instanceof Date ? subscription.startedOn : new Date(subscription.startedOn);
+	const daysUntilRenewal = getDaysUntilRenewal(renewalDate);
 	const showRenewalWarning = daysUntilRenewal <= 7 && daysUntilRenewal > 0 && subscription.status === 'Active';
 	const hasUnknownPaymentMethod = subscription.paymentMethod === 'Unknown';
 
 	// Calculate review state dynamically
-	const isInReview = shouldBeInReviewState(subscription);
-	const reviewReasons = getReviewReasons(subscription);
+	const subscriptionForReview = {
+		paymentMethod: subscription.paymentMethod,
+		name: subscription.name,
+		price: subscription.price,
+		cycle: subscription.cycle,
+		renewalDate: renewalDate,
+	};
+	const isInReview = shouldBeInReviewState(subscriptionForReview);
+	const reviewReasons = getReviewReasons(subscriptionForReview);
 	const displayStatus = isInReview ? 'Review' : subscription.status;
 
 	const handleCopy = () => {
-		// Mock copy logic
-		console.log('Copy subscription details');
+		if (!id) return;
+		// Duplicate subscription
+		duplicateSubscription(id);
+		// Navigate to subscriptions list to see the new one
+		navigate('/app/subscriptions');
 	};
 
 	const handleEdit = () => {
+		if (!id) return;
 		navigate(`/app/subscription/${id}/edit`);
 	};
 
 	const handleDelete = () => {
-		// Mock delete logic
-		console.log('Delete subscription');
+		setShowDeleteConfirm(true);
+	};
+
+	const handleConfirmDelete = () => {
+		if (!id) return;
+		deleteSubscription(id);
+		navigate('/app/subscriptions');
 	};
 
 	const handleGoToCancellation = () => {
-		// Mock cancellation logic
-		console.log('Go to cancellation page');
+		// Open cancellation link if available, otherwise do nothing
+		const cancellationLink = (subscription as any)?.cancellationLink;
+		if (cancellationLink) {
+			window.open(cancellationLink, '_blank', 'noopener,noreferrer');
+		}
 	};
 
 	return (
 		<AppLayout>
-			<div className="pt-12 pb-8">
-				<div className="w-full max-w-[438px] flex flex-col gap-6 items-start">
+			<div className="pt-6 sm:pt-8 md:pt-12 pb-6 sm:pb-8">
+				<div className="w-full max-w-[438px] flex flex-col gap-4 sm:gap-6 items-start">
 					{/* Breadcrumb */}
 					<p className="font-mono font-normal text-sm leading-5 text-neutral-700">
 						Subscriptions / <span className="text-white">{subscription.name}</span>
@@ -218,14 +205,14 @@ export default function SubscriptionDetail() {
 						</div>
 
 						{/* Started On + Renewal Date */}
-						<div className="w-full flex flex-col gap-6 pb-6 border-b border-neutral-200">
-							<div className="w-full flex gap-1 items-start">
+						<div className="w-full flex flex-col gap-4 sm:gap-6 pb-6 border-b border-neutral-200">
+							<div className="w-full flex flex-col sm:flex-row gap-4 sm:gap-1 items-stretch sm:items-start">
 								<div className="flex-1 flex flex-col gap-1">
 									<span className="font-light text-sm leading-5 text-neutral-700 tracking-tight">
 										Started on
 									</span>
 									<span className="font-normal text-lg leading-6 text-white">
-										{formatDate(subscription.startedOn)}
+										{formatDate(startedOn)}
 									</span>
 								</div>
 								<div className="flex-1 flex flex-col gap-1">
@@ -234,7 +221,7 @@ export default function SubscriptionDetail() {
 									</span>
 									<span className={`font-normal text-lg leading-6 ${showRenewalWarning ? 'text-warning-500' : 'text-white'
 										}`}>
-										{formatDate(subscription.renewalDate)}
+										{formatDate(renewalDate)}
 									</span>
 								</div>
 							</div>
@@ -250,13 +237,19 @@ export default function SubscriptionDetail() {
 							)}
 
 							{/* Cancellation Link */}
-							<button
-								type="button"
-								onClick={handleGoToCancellation}
-								className="w-full h-[42px] px-6 py-2.5 bg-neutral-200 border border-neutral-50 rounded-lg flex items-center justify-center font-semibold text-base leading-[22px] text-white hover:bg-neutral-300 transition-colors"
-							>
-								Go to cancelation page
-							</button>
+							{(subscription as any)?.cancellationLink ? (
+								<button
+									type="button"
+									onClick={handleGoToCancellation}
+									className="w-full min-h-[44px] sm:h-[42px] px-6 py-2.5 bg-neutral-200 border border-neutral-50 rounded-lg flex items-center justify-center font-semibold text-sm sm:text-base leading-5 sm:leading-[22px] text-white hover:bg-neutral-300 transition-colors active:opacity-75"
+								>
+									Go to cancelation page
+								</button>
+							) : (
+								<p className="font-normal text-sm leading-5 text-neutral-700 italic">
+									Cancellation link not available
+								</p>
+							)}
 						</div>
 
 						{/* Notes */}
@@ -276,6 +269,36 @@ export default function SubscriptionDetail() {
 						</div>
 					</div>
 				</div>
+
+				{/* Delete Confirmation Modal */}
+				{showDeleteConfirm && (
+					<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+						<div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6 max-w-md w-full flex flex-col gap-4">
+							<h3 className="font-semibold text-lg leading-6 text-white">
+								Delete subscription?
+							</h3>
+							<p className="font-normal text-sm leading-5 text-neutral-700">
+								This action cannot be undone. The subscription will be permanently deleted.
+							</p>
+							<div className="flex gap-3 mt-2">
+								<button
+									type="button"
+									onClick={() => setShowDeleteConfirm(false)}
+									className="flex-1 px-4 py-2.5 bg-neutral-700 border border-neutral-600 text-white text-sm font-medium rounded-lg hover:bg-neutral-600 transition-colors"
+								>
+									Cancel
+								</button>
+								<button
+									type="button"
+									onClick={handleConfirmDelete}
+									className="flex-1 px-4 py-2.5 bg-danger-500 text-white text-sm font-medium rounded-lg hover:bg-danger-600 transition-colors"
+								>
+									Delete
+								</button>
+							</div>
+						</div>
+					</div>
+				)}
 			</div>
 		</AppLayout>
 	);

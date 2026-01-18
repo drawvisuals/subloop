@@ -21,7 +21,7 @@ export function EmptyState() {
 	};
 
 	const handleAddManually = () => {
-		navigate('/app/subscription/add');
+		navigate('/app/subscriptions/new');
 	};
 
 	return (

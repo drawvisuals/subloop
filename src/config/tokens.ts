@@ -39,7 +39,7 @@ export const tokens = {
       black: '#000000',
     },
 
-    // Neutral scale
+    // Neutral scale - darkest to lightest
     neutral: {
       50: '#0B0B0B',
       100: '#101010',
@@ -50,6 +50,7 @@ export const tokens = {
       600: '#505050',
       700: '#7C7C7C',
       800: '#919191',
+      900: '#000000', // Pure black - used for darkest backgrounds (marketing/app main)
     },
 
     // Semantic colors
@@ -93,24 +94,25 @@ export const tokens = {
       },
     },
 
-    // Commonly used color mappings (from design context)
-    // Text colors
+    // Commonly used color mappings (from Figma design)
+    // Text colors - for dark UI theme
     text: {
-      primary: '#070707', // neutral/900
-      secondary: '#7c7c7c', // neutral/200
-      muted: '#1B1B1B', // neutral/700
+      primary: '#ffffff', // foundation.white - primary text on dark backgrounds
+      secondary: '#7C7C7C', // neutral.700 - secondary/muted text
+      muted: '#7C7C7C', // neutral.700 - muted text
     },
 
-    // Background colors
+    // Background colors - dark UI theme
     background: {
-      primary: '#070707', // neutral/900 (black UI)
-      secondary: '#1B1B1B', // neutral/700
+      primary: '#0B0B0B', // neutral.50 - main dark background
+      secondary: '#101010', // neutral.100 - secondary dark background
+      card: '#101010', // neutral.100 - card backgrounds
     },
 
-    // Border colors
+    // Border colors - for dark UI theme
     border: {
-      default: '#1B1B1B', // neutral/700
-      muted: '#7c7c7c', // neutral/200
+      default: '#1B1B1B', // neutral.200 - primary borders
+      muted: '#7C7C7C', // neutral.700 - subtle borders
     },
   },
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleButton, Input, Divider, Button } from '@/components/Auth';
 import { mockLogin } from '@/services/auth';
+import { getPostAuthRedirect } from '@/services/onboarding';
 
 /**
  * Login page
@@ -63,9 +64,10 @@ export default function Login() {
 			const result = await mockLogin(email, password);
 
 			if (result.success) {
-				// Redirect to subscriptions page
+				// Redirect based on onboarding state
 				setIsSubmitting(false);
-				navigate('/app/subscriptions');
+				const redirectPath = getPostAuthRedirect();
+				navigate(redirectPath);
 			} else {
 				setErrors({ general: result.error || 'Invalid email or password' });
 				setIsSubmitting(false);
@@ -142,7 +144,7 @@ export default function Login() {
 
 					{/* General Error Message */}
 					{errors.general && (
-						<div className="w-full p-4 bg-danger-500/10 border border-danger-500 rounded-lg">
+						<div className="w-full p-4 bg-danger-500/10 border border-danger-500 rounded-lg" role="alert" aria-live="polite">
 							<p className="text-sm text-danger-500 leading-[22px]">
 								{errors.general}
 							</p>

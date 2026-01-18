@@ -71,12 +71,12 @@ export default function Profile() {
     setShowDeleteConfirm(false);
   };
 
-  return (
-    <AppLayout>
-      <div className="pt-12 pb-8">
-        <div className="w-full max-w-[438px] flex flex-col gap-8">
+	return (
+		<AppLayout>
+			<div className="pt-6 sm:pt-8 md:pt-12 pb-6 sm:pb-8">
+				<div className="w-full max-w-[438px] flex flex-col gap-6 sm:gap-8">
           {/* Page Title */}
-          <h1 className="font-semibold text-2xl leading-[30px] text-white tracking-tight">
+          <h1 className="font-semibold text-xl sm:text-2xl leading-[28px] sm:leading-[30px] text-white tracking-tight">
             Manage your account
           </h1>
 
@@ -99,7 +99,7 @@ export default function Profile() {
               </div>
 
               {/* Profile Photo + Name + Email */}
-              <div className="w-full flex items-center justify-between">
+              <div className="w-full flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
                 <div className="flex gap-3 items-center">
                   {/* Profile Photo */}
                   <div className="w-11 h-11 rounded-full overflow-hidden relative border-2 border-neutral-400 shrink-0">
@@ -120,7 +120,7 @@ export default function Profile() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex items-center gap-1 text-sm font-semibold text-danger-400 hover:text-danger-500 transition-colors"
+                  className="flex items-center gap-1 text-sm font-semibold text-danger-400 hover:text-danger-500 transition-colors min-h-[44px] sm:min-h-0 active:opacity-75"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Log out</span>
@@ -151,7 +151,7 @@ export default function Profile() {
               </h2>
 
               {/* Current Plan */}
-              <div className="w-full pb-5 border-b border-neutral-700 flex items-start justify-between">
+              <div className="w-full pb-5 border-b border-neutral-700 flex flex-col sm:flex-row gap-3 sm:gap-0 items-start sm:items-center justify-between">
                 <div className="flex-1 flex flex-col gap-3">
                   <div className="flex items-center gap-2">
                     <Snail className="w-4 h-4 text-neutral-700 shrink-0" />

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleButton, Input, Divider, Button } from '@/components/Auth';
 import { mockSignup } from '@/services/auth';
+import { getPostAuthRedirect } from '@/services/onboarding';
 
 /**
  * Create Account page
@@ -61,9 +62,10 @@ export default function SignUp() {
 			const result = await mockSignup(email, password);
 
 			if (result.success) {
-				// Redirect to subscriptions page
+				// Redirect based on onboarding state
 				setIsSubmitting(false);
-				navigate('/app/subscriptions');
+				const redirectPath = getPostAuthRedirect();
+				navigate(redirectPath);
 			} else {
 				setErrors({ general: result.error || 'Failed to create account' });
 				setIsSubmitting(false);
@@ -129,7 +131,7 @@ export default function SignUp() {
 
 					{/* General Error Message */}
 					{errors.general && (
-						<div className="w-full p-4 bg-danger-500/10 border border-danger-500 rounded-lg">
+						<div className="w-full p-4 bg-danger-500/10 border border-danger-500 rounded-lg" role="alert" aria-live="polite">
 							<p className="text-sm text-danger-500 leading-[22px]">
 								{errors.general}
 							</p>

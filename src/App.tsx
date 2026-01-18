@@ -12,8 +12,6 @@ import EditSubscription from "./pages/Subscriptions/EditSubscription";
 import Settings from "./pages/Settings/Settings";
 import Profile from "./pages/Profile/Profile";
 import Landing from "./pages/Marketing/Landing";
-import Pricing from "./pages/Marketing/Pricing";
-import FAQ from "./pages/Marketing/FAQ";
 import CheckoutSuccess from "./pages/Checkout/Success";
 import CheckoutCancel from "./pages/Checkout/Cancel";
 
@@ -22,8 +20,6 @@ export default function App() {
 		<BrowserRouter>
 			<Routes>
 				<Route path="/" element={<Landing />} />
-				<Route path="/pricing" element={<Pricing />} />
-				<Route path="/faq" element={<FAQ />} />
 				<Route path="/checkout/success" element={<CheckoutSuccess />} />
 				<Route path="/checkout/cancel" element={<CheckoutCancel />} />
 				<Route path="/auth/login" element={<Login />} />
@@ -32,7 +28,7 @@ export default function App() {
 				<Route path="/onboarding/scanning" element={<Scanning />} />
 				<Route path="/onboarding/browser-extension" element={<BrowserExtension />} />
 				<Route path="/app/subscriptions" element={<SubscriptionsList />} />
-				<Route path="/app/subscription/add" element={<AddSubscription />} />
+				<Route path="/app/subscriptions/new" element={<AddSubscription />} />
 				<Route path="/app/subscription/:id/edit" element={<EditSubscription />} />
 				<Route path="/app/subscription/:id" element={<SubscriptionDetail />} />
 				<Route path="/app/settings" element={<Settings />} />

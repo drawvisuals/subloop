@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/Layout';
 import { Toggle } from '@/components/Onboarding/Toggle';
 import { Button } from '@/components/Auth';
 import { ScanText, AlertTriangle, CheckCircle2, Globe } from 'lucide-react';
+import { getOnboardingState, updateOnboardingState, markScanStarted } from '@/services/onboarding';
 
 interface ConnectedInboxData {
   email: string;
@@ -12,21 +13,39 @@ interface ConnectedInboxData {
   lastScanned: Date;
 }
 
-// Mock connected inboxes data
-const mockConnectedInboxes: ConnectedInboxData[] = [
-  { email: 'ivan.rubyo@gmail.com', provider: 'gmail', status: 'connected', lastScanned: new Date('2026-01-16T10:30:00') },
-  { email: 'ivan.rubyo@outlook.com', provider: 'outlook', status: 'disconnected', lastScanned: new Date('2025-10-13T14:20:00') },
-];
-
 export default function Settings() {
   const navigate = useNavigate();
-  const [connectedInboxes, setConnectedInboxes] = useState<ConnectedInboxData[]>(mockConnectedInboxes);
-  const [browserExtensionConnected] = useState(false);
+  const onboardingState = getOnboardingState();
+  const [connectedInboxes, setConnectedInboxes] = useState<ConnectedInboxData[]>([]);
+  const [browserExtensionConnected, setBrowserExtensionConnected] = useState(
+    onboardingState.browserExtensionStatus === 'connected'
+  );
   const [disconnectingInbox, setDisconnectingInbox] = useState<string | null>(null);
 
+  // Load connected inboxes from onboarding state
+  useEffect(() => {
+    // Mock inboxes based on onboarding state
+    const inboxes: ConnectedInboxData[] = [];
+    if (onboardingState.emailConnectedCount > 0) {
+      // Get current user email from auth
+      const { getCurrentUser } = require('@/services/auth');
+      const userEmail = getCurrentUser();
+      if (userEmail) {
+        inboxes.push({
+          email: userEmail,
+          provider: userEmail.includes('gmail') ? 'gmail' : 'outlook',
+          status: 'connected',
+          lastScanned: new Date(),
+        });
+      }
+    }
+    setConnectedInboxes(inboxes);
+  }, [onboardingState.emailConnectedCount]);
+
   const handleRescan = () => {
-    // Mock rescan logic
-    console.log('Rescan emails');
+    // Start scan and navigate to scanning page
+    markScanStarted();
+    navigate('/onboarding/scanning');
   };
 
   const handleToggleInbox = (email: string, checked: boolean) => {
@@ -35,6 +54,8 @@ export default function Settings() {
       setDisconnectingInbox(email);
     } else {
       // Reconnect inbox
+      const newCount = Math.max(1, onboardingState.emailConnectedCount + 1);
+      updateOnboardingState({ emailConnectedCount: newCount });
       setConnectedInboxes(prev =>
         prev.map(inbox =>
           inbox.email === email ? { ...inbox, status: 'connected' as const } : inbox
@@ -45,6 +66,8 @@ export default function Settings() {
 
   const handleConfirmDisconnect = () => {
     if (disconnectingInbox) {
+      const newCount = Math.max(0, onboardingState.emailConnectedCount - 1);
+      updateOnboardingState({ emailConnectedCount: newCount });
       setConnectedInboxes(prev =>
         prev.map(inbox =>
           inbox.email === disconnectingInbox ? { ...inbox, status: 'disconnected' as const } : inbox
@@ -67,10 +90,10 @@ export default function Settings() {
     return formatDate(date);
   };
 
-  return (
-    <AppLayout>
-      <div className="pt-12 pb-8">
-        <div className="w-full max-w-[438px] flex flex-col gap-8">
+	return (
+		<AppLayout>
+			<div className="pt-6 sm:pt-8 md:pt-12 pb-6 sm:pb-8">
+				<div className="w-full max-w-[438px] flex flex-col gap-6 sm:gap-8">
           {/* Email Scanning Section */}
           <div className="w-full flex flex-col gap-6">
             {/* Title + Description */}
@@ -132,11 +155,29 @@ export default function Settings() {
 
                     {/* Disconnect Warning */}
                     {isDisconnecting && (
-                      <div className="px-4 py-3 bg-warning-500/10 border border-warning-500 rounded-lg flex gap-3">
-                        <AlertTriangle className="w-4 h-4 text-neutral-700 shrink-0 mt-0.5" />
-                        <p className="font-normal text-base leading-[22px] text-neutral-700 tracking-tight">
-                          We'll stop scanning this inbox. Your subscriptions won't change.
-                        </p>
+                      <div className="px-4 py-3 bg-warning-500/10 border border-warning-500 rounded-lg flex flex-col sm:flex-row gap-3">
+                        <div className="flex gap-3 flex-1">
+                          <AlertTriangle className="w-4 h-4 text-neutral-700 shrink-0 mt-0.5" />
+                          <p className="font-normal text-base leading-[22px] text-neutral-700 tracking-tight">
+                            We'll stop scanning this inbox. Your subscriptions won't change.
+                          </p>
+                        </div>
+                        <div className="flex gap-2 sm:ml-auto">
+                          <button
+                            type="button"
+                            onClick={() => setDisconnectingInbox(null)}
+                            className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-white transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleConfirmDisconnect}
+                            className="px-4 py-2 text-sm font-medium text-neutral-900 bg-neutral-200 rounded-lg hover:bg-neutral-300 transition-colors"
+                          >
+                            Disconnect
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -148,7 +189,7 @@ export default function Settings() {
             <button
               type="button"
               onClick={handleRescan}
-              className="w-full h-[52px] px-4 py-2.5 bg-neutral-200 border border-neutral-50 rounded-lg flex items-center justify-center gap-2 font-medium text-base leading-[22px] text-white hover:bg-neutral-300 transition-colors"
+              className="w-full min-h-[44px] sm:h-[52px] px-4 py-2.5 bg-neutral-200 border border-neutral-50 rounded-lg flex items-center justify-center gap-2 font-medium text-sm sm:text-base leading-5 sm:leading-[22px] text-white hover:bg-neutral-300 transition-colors active:opacity-75"
             >
               <span>Rescan</span>
               <ScanText className="w-4 h-4" />

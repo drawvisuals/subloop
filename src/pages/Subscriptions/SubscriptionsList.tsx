@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/Layout';
 import { SearchInput } from '@/components/Subscriptions/SearchInput';
@@ -6,6 +6,7 @@ import { FilterDropdown } from '@/components/Subscriptions/FilterDropdown';
 import { EmptyState } from '@/components/Subscriptions/EmptyState';
 import { Plus, ArrowUpToLine, ArrowUpDown, Eye, EyeOff, Copy, PenLine, Trash2 } from 'lucide-react';
 import { shouldBeInReviewState } from '@/utils/subscriptionHelpers';
+import { getSubscriptions, deleteSubscription, duplicateSubscription } from '@/services/subscriptionsStorage';
 
 interface Subscription {
 	id: string;
@@ -18,79 +19,6 @@ interface Subscription {
 	isVisible?: boolean;
 }
 
-// Mock data
-const mockSubscriptions: Subscription[] = [
-	{
-		id: '1',
-		name: 'Netflix',
-		price: 24.99,
-		cycle: 'Monthly',
-		paymentMethod: 'Visa ****4567',
-		renewalDate: new Date('2026-01-16'),
-		status: 'Active',
-		isVisible: true,
-	},
-	{
-		id: '2',
-		name: 'Spotify',
-		price: 143.88,
-		cycle: 'Annually',
-		paymentMethod: 'PayPal',
-		renewalDate: new Date('2025-10-04'),
-		status: 'Inactive',
-		isVisible: false,
-	},
-	{
-		id: '3',
-		name: 'YouTube',
-		price: 13.99,
-		cycle: 'Monthly',
-		paymentMethod: 'Visa ****4567',
-		renewalDate: new Date('2026-03-07'),
-		status: 'Active',
-		isVisible: true,
-	},
-	{
-		id: '4',
-		name: 'Apple Music',
-		price: 10.99,
-		cycle: 'Monthly',
-		paymentMethod: 'Apple Pay',
-		renewalDate: new Date('2026-03-12'),
-		status: 'Active',
-		isVisible: true,
-	},
-	{
-		id: '5',
-		name: 'Google One',
-		price: 29.99,
-		cycle: 'Annually',
-		paymentMethod: 'Google Pay',
-		renewalDate: new Date('2026-12-23'),
-		status: 'Active',
-		isVisible: true,
-	},
-	{
-		id: '6',
-		name: 'Adobe CC',
-		price: 69.99,
-		cycle: 'Monthly',
-		paymentMethod: 'Visa ****4567',
-		renewalDate: new Date('2025-12-14'),
-		status: 'Inactive',
-		isVisible: true,
-	},
-	{
-		id: '7',
-		name: 'Dropbox',
-		price: 119.88,
-		cycle: 'Annually',
-		paymentMethod: 'Unknown',
-		renewalDate: new Date('2027-01-18'),
-		status: 'Review',
-		isVisible: true,
-	},
-];
 
 function formatDate(date: Date): string {
 	return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -126,10 +54,43 @@ function calculateTotals(subscriptions: Subscription[]) {
 }
 
 export default function SubscriptionsList() {
-	const [subscriptions] = useState<Subscription[]>(mockSubscriptions);
+	const navigate = useNavigate();
+	const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [statusFilter, setStatusFilter] = useState<string>('');
 	const [paymentMethodFilter, setPaymentMethodFilter] = useState<string>('');
+	const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+	// Load subscriptions from storage
+	const loadSubscriptions = () => {
+		const stored = getSubscriptions();
+		// Convert to component format
+		const formatted: Subscription[] = stored.map(sub => ({
+			id: sub.id,
+			name: sub.name,
+			price: sub.price,
+			cycle: sub.cycle,
+			paymentMethod: sub.paymentMethod,
+			renewalDate: sub.renewalDate instanceof Date ? sub.renewalDate : new Date(sub.renewalDate),
+			status: sub.status,
+			isVisible: sub.isVisible !== undefined ? sub.isVisible : true,
+		}));
+		setSubscriptions(formatted);
+	};
+
+	useEffect(() => {
+		loadSubscriptions();
+		// Listen for storage changes (from other tabs/components)
+		const handleStorageChange = () => loadSubscriptions();
+		window.addEventListener('storage', handleStorageChange);
+		// Listen for custom events (same-tab updates)
+		const handleSubscriptionUpdate = () => loadSubscriptions();
+		window.addEventListener('subscriptionUpdated', handleSubscriptionUpdate);
+		return () => {
+			window.removeEventListener('storage', handleStorageChange);
+			window.removeEventListener('subscriptionUpdated', handleSubscriptionUpdate);
+		};
+	}, []);
 
 	const statusOptions = [
 		{ value: '', label: 'Status' },
@@ -168,50 +129,62 @@ export default function SubscriptionsList() {
 
 	const hasSubscriptions = filteredSubscriptions.length > 0;
 
+	const handleConfirmDelete = () => {
+		if (deleteConfirmId) {
+			deleteSubscription(deleteConfirmId);
+			setDeleteConfirmId(null);
+			// Reload will happen via event listener
+		}
+	};
+
 	return (
 		<AppLayout>
-			<div className="pt-12 pb-8">
+			<div className="pt-6 sm:pt-8 md:pt-12 pb-6 sm:pb-8">
 				{/* Search + Filters + Actions */}
-				<div className="flex gap-6 items-center mb-8">
+				<div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 items-stretch sm:items-center mb-6 sm:mb-8">
 					{/* Search + Filters */}
-					<div className="flex gap-3 items-center">
+					<div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center flex-1">
 						<SearchInput
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
 							placeholder="Search"
+							className="flex-1"
 						/>
 						<FilterDropdown
 							label="Status"
 							options={statusOptions}
 							value={statusFilter}
 							onChange={setStatusFilter}
-							className="w-[120px]"
+							className="w-full sm:w-[120px]"
 						/>
 						<FilterDropdown
 							label="Payment method"
 							options={paymentMethodOptions}
 							value={paymentMethodFilter}
 							onChange={setPaymentMethodFilter}
-							className="w-[186px]"
+							className="w-full sm:w-[186px]"
 						/>
 					</div>
 
 					{/* Export + Add New */}
-					<div className="flex gap-3 items-center ml-auto">
+					<div className="flex gap-2 sm:gap-3 items-center sm:ml-auto">
 						<button
 							type="button"
-							className="h-[52px] px-6 py-2.5 bg-transparent border border-neutral-200 rounded-lg flex gap-2 items-center justify-center hover:border-neutral-300 transition-colors"
+							className="min-h-[44px] sm:h-[52px] px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 bg-transparent border border-neutral-200 rounded-lg flex gap-2 items-center justify-center hover:border-neutral-300 transition-colors shrink-0 active:opacity-75"
+							aria-label="Export subscriptions"
 						>
-							<span className="font-light text-sm leading-5 text-success-500">Export</span>
-							<ArrowUpToLine className="w-4 h-4 text-success-500" />
+							<span className="font-light text-xs sm:text-sm leading-4 sm:leading-5 text-success-500 hidden sm:inline">Export</span>
+							<ArrowUpToLine className="w-4 h-4 text-success-500 shrink-0" />
 						</button>
 						<button
 							type="button"
-							onClick={() => navigate('/app/subscription/add')}
-							className="h-[54px] px-6 py-4 bg-neutral-200 border border-neutral-50 rounded-lg flex gap-2 items-center justify-center hover:bg-neutral-300 transition-colors"
+							onClick={() => navigate('/app/subscriptions/new')}
+							className="min-h-[44px] sm:h-[54px] px-4 sm:px-6 py-3 sm:py-4 bg-neutral-200 border border-neutral-50 rounded-lg flex gap-2 items-center justify-center hover:bg-neutral-300 transition-colors shrink-0 active:opacity-75"
+							aria-label="Add new subscription"
 						>
-							<Plus className="w-4 h-4 text-white" />
-							<span className="font-semibold text-base leading-[22px] text-white">Add new</span>
+							<Plus className="w-4 h-4 text-white shrink-0" />
+							<span className="font-semibold text-sm sm:text-base leading-5 sm:leading-[22px] text-white hidden sm:inline">Add new</span>
+							<span className="font-semibold text-sm leading-5 text-white sm:hidden">Add</span>
 						</button>
 					</div>
 				</div>
@@ -220,9 +193,9 @@ export default function SubscriptionsList() {
 				{!hasSubscriptions ? (
 					<EmptyState />
 				) : (
-					<div className="border border-neutral-50 rounded-lg overflow-hidden">
+					<div className="border border-neutral-50 rounded-lg overflow-hidden overflow-x-auto -mx-3 sm:mx-0">
 						{/* Table Header */}
-						<div className="bg-transparent border-b border-neutral-50 px-4 py-2 pl-[72px] flex items-center">
+						<div className="bg-transparent border-b border-neutral-50 px-3 sm:px-4 py-2 pl-[52px] sm:pl-[72px] flex items-center min-w-[800px] sm:min-w-[1000px]">
 							<div className="w-[160px]">
 								<span className="font-normal text-[13px] leading-4 text-neutral-700">Subscription</span>
 							</div>
@@ -254,15 +227,40 @@ export default function SubscriptionsList() {
 								const isInactive = sub.computedStatus === 'Inactive';
 								const textColor = isInactive ? 'text-neutral-400' : 'text-white';
 
+								const handleRowClick = (e: React.MouseEvent) => {
+									// Don't navigate if clicking on action buttons
+									const target = e.target as HTMLElement;
+									if (target.closest('button') || target.closest('[role="button"]')) {
+										return;
+									}
+									navigate(`/app/subscription/${sub.id}`);
+								};
+
+								const handleCopy = (e: React.MouseEvent) => {
+									e.stopPropagation();
+									duplicateSubscription(sub.id);
+									// Reload will happen via event listener
+								};
+
+								const handleEdit = (e: React.MouseEvent) => {
+									e.stopPropagation();
+									navigate(`/app/subscription/${sub.id}/edit`);
+								};
+
+								const handleDelete = (e: React.MouseEvent) => {
+									e.stopPropagation();
+									setDeleteConfirmId(sub.id);
+								};
+
 								return (
 									<div
 										key={sub.id}
-										onClick={() => navigate(`/app/subscription/${sub.id}`)}
-										className={`border-b border-neutral-50 p-4 flex gap-4 items-center cursor-pointer hover:bg-neutral-200/50 transition-colors ${index % 2 === 1 ? 'bg-neutral-200' : 'bg-transparent'
+										onClick={handleRowClick}
+										className={`border-b border-neutral-50 p-3 sm:p-4 flex gap-2 sm:gap-4 items-center cursor-pointer hover:bg-neutral-200/50 transition-colors min-w-[800px] sm:min-w-[1000px] active:bg-neutral-200/70 ${index % 2 === 1 ? 'bg-neutral-200' : 'bg-transparent'
 											}`}
 									>
 										{/* Logo */}
-										<div className="w-10 h-10 bg-neutral-50 border border-neutral-200 rounded-lg flex items-center justify-center shrink-0">
+										<div className="w-8 h-8 sm:w-10 sm:h-10 bg-neutral-50 border border-neutral-200 rounded-lg flex items-center justify-center shrink-0">
 											<div className="w-4 h-4 bg-neutral-700 rounded" />
 										</div>
 
@@ -326,16 +324,47 @@ export default function SubscriptionsList() {
 											</div>
 										</div>
 
-										{/* Actions */}
-										<div className="flex gap-4 items-center">
-											{sub.isVisible ? (
-												<Eye className="w-4 h-4 text-white cursor-pointer hover:text-brand-primary-500 transition-colors" />
-											) : (
-												<EyeOff className="w-4 h-4 text-white cursor-pointer hover:text-brand-primary-500 transition-colors" />
-											)}
-											<Copy className="w-4 h-4 text-white cursor-pointer hover:text-brand-primary-500 transition-colors" />
-											<PenLine className="w-4 h-4 text-white cursor-pointer hover:text-brand-primary-500 transition-colors" />
-											<Trash2 className="w-4 h-4 text-white cursor-pointer hover:text-danger-500 transition-colors" />
+										{/* Actions - hide some on mobile */}
+										<div className="flex gap-2 sm:gap-4 items-center">
+											<button
+												type="button"
+												onClick={(e) => {
+													e.stopPropagation();
+													// Toggle visibility - can be implemented later
+												}}
+												className="p-0 border-0 bg-transparent cursor-pointer"
+												aria-label={sub.isVisible ? 'Hide subscription' : 'Show subscription'}
+											>
+												{sub.isVisible ? (
+													<Eye className="w-4 h-4 text-white hover:text-brand-primary-500 transition-colors min-w-[20px] min-h-[20px]" />
+												) : (
+													<EyeOff className="w-4 h-4 text-white hover:text-brand-primary-500 transition-colors min-w-[20px] min-h-[20px]" />
+												)}
+											</button>
+											<button
+												type="button"
+												onClick={handleCopy}
+												className="p-0 border-0 bg-transparent cursor-pointer hidden sm:block"
+												aria-label="Duplicate subscription"
+											>
+												<Copy className="w-4 h-4 text-white hover:text-brand-primary-500 transition-colors min-w-[20px] min-h-[20px]" />
+											</button>
+											<button
+												type="button"
+												onClick={handleEdit}
+												className="p-0 border-0 bg-transparent cursor-pointer"
+												aria-label="Edit subscription"
+											>
+												<PenLine className="w-4 h-4 text-white hover:text-brand-primary-500 transition-colors min-w-[20px] min-h-[20px]" />
+											</button>
+											<button
+												type="button"
+												onClick={handleDelete}
+												className="p-0 border-0 bg-transparent cursor-pointer"
+												aria-label="Delete subscription"
+											>
+												<Trash2 className="w-4 h-4 text-white hover:text-danger-500 transition-colors min-w-[20px] min-h-[20px]" />
+											</button>
 										</div>
 									</div>
 								);
@@ -343,24 +372,54 @@ export default function SubscriptionsList() {
 						</div>
 
 						{/* Totals */}
-						<div className="px-4 py-6 border-t border-neutral-50">
-							<div className="flex flex-col gap-4">
-								<div className="flex gap-3 items-center pb-4 border-b border-neutral-50">
-									<span className="font-mono font-normal text-sm leading-5 text-neutral-700 w-[135px]">
+						<div className="px-3 sm:px-4 py-4 sm:py-6 border-t border-neutral-50">
+							<div className="flex flex-col gap-3 sm:gap-4">
+								<div className="flex flex-col sm:flex-row gap-1 sm:gap-3 items-start sm:items-center pb-3 sm:pb-4 border-b border-neutral-50">
+									<span className="font-mono font-normal text-xs sm:text-sm leading-4 sm:leading-5 text-neutral-700 sm:w-[135px] shrink-0">
 										Total monthly
 									</span>
-									<span className="font-normal text-xl leading-[26px] text-white">
+									<span className="font-normal text-lg sm:text-xl leading-6 sm:leading-[26px] text-white">
 										${monthlyTotal.toFixed(2)} USD
 									</span>
 								</div>
-								<div className="flex gap-3 items-center">
-									<span className="font-mono font-normal text-sm leading-5 text-neutral-700 w-[135px]">
+								<div className="flex flex-col sm:flex-row gap-1 sm:gap-3 items-start sm:items-center">
+									<span className="font-mono font-normal text-xs sm:text-sm leading-4 sm:leading-5 text-neutral-700 sm:w-[135px] shrink-0">
 										Total annually
 									</span>
-									<span className="font-normal text-xl leading-[26px] text-white">
+									<span className="font-normal text-lg sm:text-xl leading-6 sm:leading-[26px] text-white">
 										${annuallyTotal.toFixed(2)} USD
 									</span>
 								</div>
+							</div>
+						</div>
+					</div>
+				)}
+
+				{/* Delete Confirmation Modal */}
+				{deleteConfirmId && (
+					<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+						<div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6 max-w-md w-full flex flex-col gap-4">
+							<h3 className="font-semibold text-lg leading-6 text-white">
+								Delete subscription?
+							</h3>
+							<p className="font-normal text-sm leading-5 text-neutral-700">
+								This action cannot be undone. The subscription will be permanently deleted.
+							</p>
+							<div className="flex gap-3 mt-2">
+								<button
+									type="button"
+									onClick={() => setDeleteConfirmId(null)}
+									className="flex-1 px-4 py-2.5 bg-neutral-700 border border-neutral-600 text-white text-sm font-medium rounded-lg hover:bg-neutral-600 transition-colors"
+								>
+									Cancel
+								</button>
+								<button
+									type="button"
+									onClick={handleConfirmDelete}
+									className="flex-1 px-4 py-2.5 bg-danger-500 text-white text-sm font-medium rounded-lg hover:bg-danger-600 transition-colors"
+								>
+									Delete
+								</button>
 							</div>
 						</div>
 					</div>

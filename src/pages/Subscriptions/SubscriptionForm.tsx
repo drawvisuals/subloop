@@ -120,8 +120,8 @@ export function SubscriptionForm({
 
   return (
     <AppLayout>
-      <div className="pt-12 pb-8">
-        <div className="w-full max-w-[438px] flex flex-col gap-6 items-start">
+      <div className="pt-6 sm:pt-8 md:pt-12 pb-6 sm:pb-8">
+        <div className="w-full max-w-[438px] flex flex-col gap-4 sm:gap-6 items-start">
           {/* Breadcrumb */}
           <p className="font-mono font-normal text-sm leading-5 text-neutral-700">
             Subscriptions / <span className="text-white">{title}</span>
@@ -139,7 +139,7 @@ export function SubscriptionForm({
             />
 
             {/* Price + Currency */}
-            <div className="w-full flex gap-1 items-start">
+            <div className="w-full flex flex-col sm:flex-row gap-4 sm:gap-1 items-stretch sm:items-start">
               <div className="flex-1">
                 <Input
                   label="Price"
@@ -268,7 +268,7 @@ export function SubscriptionForm({
             </div>
 
             {/* Started On + Renewal Date */}
-            <div className="w-full flex gap-1 items-start">
+            <div className="w-full flex flex-col sm:flex-row gap-4 sm:gap-1 items-stretch sm:items-start">
               <div className="flex-1">
                 <Input
                   label="Started on"
@@ -357,15 +357,15 @@ export function SubscriptionForm({
             </div>
 
             {/* Buttons */}
-            <div className="w-full flex gap-3 items-center">
+            <div className="w-full flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
               <button
                 type="button"
                 onClick={onCancel}
-                className="flex-1 h-[54px] px-6 py-4 bg-neutral-200 border border-neutral-50 rounded-lg flex items-center justify-center font-semibold text-base leading-[22px] text-white hover:bg-neutral-300 transition-colors"
+                className="flex-1 min-h-[44px] sm:h-[54px] px-6 py-3 sm:py-4 bg-neutral-200 border border-neutral-50 rounded-lg flex items-center justify-center font-semibold text-sm sm:text-base leading-5 sm:leading-[22px] text-white hover:bg-neutral-300 transition-colors active:opacity-75"
               >
                 Cancel
               </button>
-              <Button type="submit" className="flex-1">
+              <Button type="submit" className="flex-1 min-h-[44px] sm:h-[54px]">
                 {submitLabel}
               </Button>
             </div>
